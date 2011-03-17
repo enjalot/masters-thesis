@@ -1,1 +1,11 @@
 Ian Johnson's Master's Thesis for the Department of Scientific Computing at Florida State University
+
+All the tex files relevant to the thesis are contained in the fsutemplate folder
+I've added
+
+#from Evan
+macros.tex
+misc_macros.tex
+
+#from Ian
+mythesis.bib

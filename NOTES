@@ -1,0 +1,72 @@
+
+Table of Contents
+
+Abstract
+Acknowledgements
+TOC - List of Figures - List of Tables 
+1. Introduction
+2. Educational Game Development (Blender)
+3. GPU Computing
+4. Particle Systems
+5. Fluid Simulation - SPH
+6. Implementation
+7. Results
+8. Future Work
+Bibliography
+Source
+
+
+
+2. Blender (Educational game development)
+* introduce blender software and BGE
+* screenshots of UI
+* describe interaction
+* show sph in action
+
+
+3. GPU Computing
+sub-sections?
+* OpenCL vs. CUDA
+(maybe i should leave optimizations for the Implementation section after I've
+covered some of the reasons we'd need them) 
+* opencl wrappers
+* CL-GL interop should be well explained, important concept for real-time. not
+necessarily straightforward unless pieced together from online sources.
+
+
+4. Particle Systems:
+Point or particle systems are fundamentally a set of 3dimensional coordinates
+which move over time. The particles may have different properties which may
+also change with time or location. 
+
+
+5. SPH
+* basic idea, simple formulation
+* cover parameters/basis functions we use, reference other papers 
+* good diagrams (use python visualization with vectors/density)
+
+
+
+6. Implementation
+* class based templated C++, library with an API
+* System classes, focus on SPH
+* grid/hash technique for nearest neighbor sort
+* shared memory optimization - collisions and hash datastructure 
+* rendering
+* blender source modification
+
+
+7. Results
+* Simple particle system on DELL ATI vs. DELL NVIDIA vs. MBP NVIDIA
+    with memory counts and timings
+* SPH timings on same 3 machines - 1 update ms timings 
+    as well as 10 update FPS timings
+    note that timestep affects accuracy and realism speed
+* Render timing, GLSL simple shaders, Andrew's progress 
+
+8. Future Work
+* optimization!!
+* improved integration with blender, making a game engine particle class and
+eventually extend existing particles
+
+
