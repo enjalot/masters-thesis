@@ -4,11 +4,11 @@
 \section{OpenCL}
 
 \subsection{float4}
-The OpenCL 1.0 specification defines the $float4$ type as a vector of four
+The OpenCL 1.0 specification defines the \verb|float4| type as a vector of four
 floating point numbers. Since our simulation is designed to be 3 dimensional it
 is the most convenient data type for storing arrays of coordinates. The OpenCL
-1.1 standard does define a $float3$ type, but as of this writing the 1.0
-standard is still the most widely available implementation so we use $float4$
+1.1 standard does define a \verb|float3| type, but as of this writing the 1.0
+standard is still the most widely available implementation so we use \verb|float4|
 for backwards compatibility. We have also found it convenient to package many
 variables into a single array for use on the GPU, and we are able to utilize
 the unused components of 3 dimensional vectors for storing some scalar values.

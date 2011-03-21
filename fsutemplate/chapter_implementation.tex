@@ -1,8 +1,89 @@
 \chapter{Implementation}
 
-\section{C++ Library}
-\toi{ class based templated C++, library with an API}
-\toi{ System classes, focus on SPH}
+\section{The RTPS Library}
+
+In this section we discuss the various classes which make up the Real-Time Particle System framework. Filenames will be denoted as such \verb|rtps/RTPS.h| and refer to the directory structure of the code. \toi{link to code here? or reference?}
+
+\subsection{RTPS}
+
+The entry point into the framework is the \verb|rtps/RTPS.h| header file. This file defines
+the RTPS class which a user of the library will instanciate in order to run a
+particle based simulation. The Application Programmers Interface (API) is
+relatively simple, giving the user an object which only exposes two methods, a
+\verb|update| function and an \verb|render| function. These two functions abstract
+internal logic for updating the simulation and displaying of the particles. The
+constructor to the class accepts either no arguments or an RTPSettings object.
+This object contains many settings including the type of simulation to
+instanciate, rendering options as well as simulation parameters. 
+
+The typical use case (with default settings) is envisioned as follows
+\begin{cppcode}{0}
+#include "RTPS.h"
+using namespace rtps;
+//... initialization phase ...
+RTPSettings settings();
+RTPS ps(settings);
+
+//... run loop ...
+while(true)
+{
+    //... event handling and game logic
+    ps.update()
+    //... rendering phase
+    ps.render()
+}
+
+\end{cppcode}
+
+The class is implemented in \verb|rtps/RTPS.cpp|.
+
+\subsection{RTPSettings}
+
+The available settings are defined in \verb|rtps/RTPSettings.h| along with
+public getter and setter methods which allow parameters to be set after a
+settings object is instantiated. This is desirable since different systems will
+offer different combinations of settings and rather than creating, implementing
+and innevitably changing new constructors, the proper combination of settings
+can be set with calls to the setter functions. This is especially convenient
+when developing for a user interface such as in Blender where the configuration
+of settings is not known until runtime. 
+The \verb|RTPSettings| header file can be found in the Appendix
+\toi{link to Appendix and put header file in there}
+
+
+\subsection{System}
+
+Interaction with the simulation is provided through the \verb|system| object which
+will have various methods depending on what type of simulation was set in the
+settings. The most important methods are those which allow the user to add
+particles to a system, namely \verb|addBox|, \verb|addBall| and \verb|addHose|. For the fluid
+simulation there is also the \verb|loadTriangles| method which allows the user to
+pass in triangles for the fluid particles to collide with.
+
+These methods are declared in the System.h header file which defines an
+Abstract Class \verb|System|. The methods are implemented in the specific system
+classes such as \verb|SPH| and \verb|Simple|.
+
+\subsection{Common Structures}
+
+Utilized throughout the code is the \verb|float4| struct. \verb|float4| structs are used
+to represent coordinate positions of the particles, as well as many of the
+properties associated with the particles such as density, velocity and force.
+The functionality of the \verb|float4| class match the OpenCL \verb|float4| type as close
+as possible. We have overloaded several operators for constructing and doing
+arithmetic as well as provided a print function. This functionality allows the
+developer to quickly construct data for interacting with the system. Being able
+to reimplement an OpenCL routine on the CPU is also convenient for debugging
+logic since it makes printing output much simpler. 
+There is also the \verb|int4| struct which is similarly a vector of four integers
+for more convenient communication with OpenCL.
+the declarations and definitions for these structures and related functions can
+be found in \verb|rtps/structs.h| and \verb|rtps/structs.cpp|
+
+
+\subsection{Domain}
+
+The \verb|Domain| class calculates and stores the parameters for a regular grid on the interior of a cube. The cube serves as a bounding domain for the particles in a simulation, wheras the grid is used to accelerate the neighbor search for particles. It is important to note that the grid is not stored as a set of nodes or cells, only the minimum and maximum of the cube along with the size and number of cells in each dimension.
 
 
 
@@ -22,11 +103,39 @@ It is often desirable to output the values of a variable while debugging code,
 however this is currently not simple with OpenCL. We have implemented a pattern
 using a set of macros in the kernel source code as well as two dedicated arrays
 with corresponding GPU buffers. When debugging a kernel the programmer will
-pass the two buffers as the final arguments, with the first buffer being an array of $float4$ and the second buffer being an array of $int4$. Inside the kernel the user will have the folowing macros defined (we include these in our cl\_macros.h header)
-\begin{cppcode}[0]
-objects 
+pass the two buffers as the final arguments, with the first buffer being an
+array of \verb|float| and the second buffer being an array of \verb|int4|. 
+Inside the kernel the user will have the folowing macros defined (we include
+these in our cl\_macros.h header)
+\begin{cppcode}{0}
+#define DEBUG_ARGS  , __global float4* clf, __global int4* cli
+#define DEBUG_ARGV  , clf, cli
 \end{cppcode}
 
+Here \verb|DEBUG_ARGS| is added to the kernel's list of parameters as well as
+to the argument list of any functions which we wish to debug in.
+\verb|DEBUG_ARGV| is used when calling functions with the debug arguments. This
+way one can easily extend or change the debugging arrays without the tedious
+task of adding and subtracting arguments to kernel and function definitions,
+and when done debuging one can simply redefine the macros to be empty.
+
+Once the programmer has these arrays available inside of the kernel and updates
+their contents in OpenCL, the next step is bringing these arrays back to the
+CPU for printing and other analysis. The \verb|Buffer| class provides a
+\verb|copyToHost| routine which makes this straight forward. Simply initialize
+an empty vector of the same type as the array, with size equal to the
+number of elements to be copied from the GPU. Then pass this vector to the routine:
+\begin{cppcode}{0}
+//where mybuffer was instantiated like Buffer<float4>(...)
+std::vector<float4> tmp(100);
+mybuffer.copyToHost(tmp);
+//or to copy 100 elements starting at the 500th element (offset of 500)
+mybuffer.copyToHost(tmp, 500);
+\end{cppcode}
+
+The vector \verb|tmp| will then be populated with the data from the GPU and can
+be printed and manipulated using all of the familiar CPU functions available to
+the programmer. 
 
 
 \section{OpenGL}
