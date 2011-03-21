@@ -1,8 +1,10 @@
 \chapter{Implementation}
 
 \section{C++ Library}
-* class based templated C++, library with an API
-* System classes, focus on SPH
+\toi{ class based templated C++, library with an API}
+\toi{ System classes, focus on SPH}
+
+
 
 \section{SPH Routines}
 \subsection{Nearest Neighbor Search}
@@ -12,6 +14,20 @@
 \section{OpenCL}
 \subsection{Shared memory optimization}
 * shared memory optimization - collisions and hash datastructure 
+
+
+\subsection{Debugging Routines}
+
+It is often desirable to output the values of a variable while debugging code,
+however this is currently not simple with OpenCL. We have implemented a pattern
+using a set of macros in the kernel source code as well as two dedicated arrays
+with corresponding GPU buffers. When debugging a kernel the programmer will
+pass the two buffers as the final arguments, with the first buffer being an array of $float4$ and the second buffer being an array of $int4$. Inside the kernel the user will have the folowing macros defined (we include these in our cl\_macros.h header)
+\begin{cppcode}[0]
+objects 
+\end{cppcode}
+
+
 
 \section{OpenGL}
 \section{Blender source modification}

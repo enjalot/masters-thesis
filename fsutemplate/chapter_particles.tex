@@ -1,4 +1,84 @@
 \chapter{Particle Systems}
 
-\section{A Framework}
+\section{Particle Systems}
+\toi{discuss the fundamental aspects of particle systems}
+* representation as points in 1, 2 and 3 dimensional space
+* per-particle properties
+* per-particle forces
+* particle - particle interaction
+
+
+\section{Introduction to the Framework}
+
+There are many aspects to particle systems which will be common to different
+simulations, namely the locations of each particle in some space as well as the
+notion of displaying them in some way. In order to create an extensible tool we
+designed an object oriented software framework for general particle systems.
+The primary motivation for this is to avoid duplicating work when creating
+different simulations.
+
+\section{The RTPS class}
+
+The entry point into the framework is the RTPS.h header file. This file defines
+the RTPS class which a user of the library will instanciate in order to run a
+particle based simulation. The Application Programmers Interface (API) is
+relatively simple, giving the user an object which only exposes two methods, a
+\toi{come up with consistent way to highlight code inline}
+$update$ function and an $render$ function. These two functions abstract
+internal logic for updating the simulation and displaying of the particles. The
+constructor to the class accepts either no arguments or an RTPSettings object.
+This object contains many settings including the type of simulation to
+instanciate, rendering options as well as simulation parameters. These settings
+\toi{link to Fluid Simulation section}
+will be covered in more detail in the Fluid Simulation section of the thesis.
+
+The typical use case (with default settings) is envisioned as follows
+\begin{cppcode}[0]
+#include "RTPS.h"
+using namespace rtps;
+//... initialization phase ...
+RTPSettings settings();
+RTPS ps(settings);
+
+//... run loop ...
+while(true)
+{
+    //... event handling and game logic
+    ps.update()
+    //... rendering phase
+    ps.render()
+}
+
+\end{cppcode}
+
+\section{The System class}
+
+Interaction with the simulation is provided through the $system$ object which
+will have various methods depending on what type of simulation was set in the
+settings. The most important methods are those which allow the user to add
+particles to a system, namely $addBox$, $addBall$ and $addHose$. For the fluid
+simulation there is also the $loadTriangles$ method which allows the user to
+pass in triangles for the fluid particles to collide with.
+
+These methods are declared in the System.h header file which defines an
+Abstract Class $System$. The methods are implemented in the specific system
+classes such as SPH and Simple.
+
+\section{Common Structures}
+
+Utilized throughout the code is the $float4$ struct. $float4$ structs are used
+to represent coordinate positions of the particles, as well as many of the
+properties associated with the particles such as density, velocity and force.
+The functionality of the $float4$ class match the OpenCL $float4$ type as close
+as possible. We have overloaded several operators for constructing and doing
+arithmetic as well as provided a print function. This functionality allows the
+developer to quickly construct data for interacting with the system. Being able
+to reimplement an OpenCL routine on the CPU is also convenient for debugging
+logic since it makes printing output much simpler. 
+There is also the $int4$ struct which is similarly a vector of four integers
+for more convenient communication with OpenCL.
+
+
+
+
 
