@@ -12,7 +12,7 @@ particle based simulation. The Application Programmers Interface (API) is
 relatively simple, giving the user an object which only exposes two methods, a
 \verb|update| function and an \verb|render| function. These two functions abstract
 internal logic for updating the simulation and displaying of the particles. The
-constructor to the class accepts either no arguments or an RTPSettings object.
+constructor to the class accepts either no arguments or an \verb|RTPSettings| object.
 This object contains many settings including the type of simulation to
 instanciate, rendering options as well as simulation parameters. 
 
@@ -83,16 +83,52 @@ be found in \verb|rtps/structs.h| and \verb|rtps/structs.cpp|
 
 \subsection{Domain}
 
-The \verb|Domain| class calculates and stores the parameters for a regular grid on the interior of a cube. The cube serves as a bounding domain for the particles in a simulation, wheras the grid is used to accelerate the neighbor search for particles. It is important to note that the grid is not stored as a set of nodes or cells, only the minimum and maximum of the cube along with the size and number of cells in each dimension.
+The \verb|Domain| class calculates and stores the parameters for a regular grid
+on the interior of a cube. The cube serves as a bounding domain for the
+particles in a simulation, wheras the grid is used to accelerate the neighbor
+search for particles. It is important to note that the grid is not stored as a
+set of nodes or cells, only the minimum and maximum of the cube along with the
+size and number of cells in each dimension.
+
+The \verb|Domain| class is found in \verb|rtps/domain/Domain.h| and
+\verb|rtps/domain/Domain.cpp| alongside \verb|rtps/domain/IV.h| and
+\verb|rtps/domain/IV.cpp| which define several helper functions for inserting
+particles at regularly spaced intervals based on grid parameters.
 
 
 
 \section{SPH Routines}
+
+The update function for the Smoothed Particle Hydrodynamic simulation can be
+broken down into three distinct parts. The first is the Nearest Neighbor search
+which computes the SPH forces for each particle in an efficient manner, the
+second is the handling of collisions with the domain boundary as well as with
+arbitrary triangular meshes, and the third is advecting the particles by
+integrating their SPH forces over time. 
+
 \subsection{Nearest Neighbor Search}
 * grid/hash technique for nearest neighbor sort
 
+\subsubsection{Particle Insertion}
+\toi{does this go here? seems like a good place}
+
+\subsection{Collision Detection}
+
+
+\subsection{Integration}
+
+
 
 \section{OpenCL}
+\subsection{CLL}
+* class which instanciates opencl
+
+\subsection{Kernel}
+
+
+\subsection{Buffer}
+
+
 \subsection{Shared memory optimization}
 * shared memory optimization - collisions and hash datastructure 
 
@@ -137,6 +173,8 @@ The vector \verb|tmp| will then be populated with the data from the GPU and can
 be printed and manipulated using all of the familiar CPU functions available to
 the programmer. 
 
+\subsection{CMake}
+\toi{explain cmake structure and main features used}
 
 \section{OpenGL}
 \section{Blender source modification}

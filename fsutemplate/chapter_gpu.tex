@@ -1,6 +1,20 @@
 \chapter{GPU Computing}
 
 \section{OpenGL}
+* basic introduction of OpenGL as standard cross-platform graphics library
+
+* talk about gpu hardware in relation to graphics, segway into GPGPU
+
+\section{General Purpose GPU Programming}
+
+* give motivations for GPGPU, brief history
+
+* compare with CUDA briefly
+
+* overview of GPU memory hierarchy
+
+* what kind of algorithms are good fit, performance primitives
+
 \section{OpenCL}
 
 \subsection{float4}
@@ -13,7 +27,15 @@ for backwards compatibility. We have also found it convenient to package many
 variables into a single array for use on the GPU, and we are able to utilize
 the unused components of 3 dimensional vectors for storing some scalar values.
 
+\subsection{C++ Wrappers}
+* discuss wrappers provided by Khronos
 
-\section{General Purpose GPU Programming}
+\subsection{CL/GL Interoperability}
+* sharing memory context to avoid transfer over PCI bus
+
+* issue on the mac, had to edit the header
+
+\subsection{Timing}
+* gpu timers
 
 
