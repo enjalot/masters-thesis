@@ -2,14 +2,63 @@
 
 \section{Particle Systems}
 \toi{discuss the fundamental aspects of particle systems}
+A Particle system is a system composed of points in space whose behavior is
+defined by rules which act on those points. Most commonly used in graphics and
+video games to simulate special effects like fire, smoke, water and explosions
+particle systems are also used in computational fluid dynamics, astrophysics
+and materials science. 
 
-* representation as points in 1, 2 and 3 dimensional space
 
-* per-particle properties
+All particle systems share some fundamental properties, first they must be able
+to represent points in 1, 2 or 3 dimensional space. For our purpose we will use
+3 dimensions, with the location of each particle being denoted with the
+coordinates \verb|x|, \verb|y| and \verb|z|. We conceptualize each particle as
+an unique individual in the system, usually representing some small piece of a
+larger whole. In our case each particle represents some small volume of water,
+but for a fire effect the particle serves as an animated paint brush. In both
+cases each particle will have some associated properties unique to it, such as
+its density in the water simulation, or its color in the fire effect.
 
-* per-particle forces
 
-* particle - particle interaction
+A particle system is not useful unless it changes over time, therefore it is
+important to have the concept of a \verb|timestep|. The timestep is used to
+determine how fast a system changes over time. It is important to distinguish
+between simulation time and real-time, one can simulate the formation of a
+galaxy over a million years, or the creation of a protien in nanoseconds and
+render each as a 30 second movie. We will discuss simulation time in terms of
+\verb|updates| to the system, where each update advances the simulation time
+one timestep. The creator of the system can determine how many updates to
+perform for some unit of real-time. This is usually measured in frames per
+second, where a frame is the rendering of a 3D scene to be displayed. A
+desirable frames per second (fps) for a video game is 60fps, with 30fps
+considered real-time. For reference, movies are displayed at 24fps. 
+
+
+Each particle has a location and some properties associated with it, and these
+can all change over time. The most common way to control how they change is by
+calculating the forces exerted on each particle. These forces can be external
+to the system, such as gravity or force fields (like wind) or internal, meaning
+the particles exert force on each other. When we update the system, we want to
+calculate a new location for each particle based on the forces applied to it.
+This is done by integrating the force to obtain a velocity and then integrating
+the velocity to obtain the new position.
+\toi{acceleration, velocity and position equations (Euler)} 
+The simplest way of computing this is called Euler's method, which takes the
+velocity at the previous timestep, and adds the force multiplied by the
+timestep. The new velocity is then multiplied by the timestep and added to the
+position at the previous timestep to obtain the new position.
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.5]{figures/eulers_method.png}
+		\label{fig:logic}
+        \caption{ A Particle moving according to forces }
+\end{figure}
+
+
+Particle systems are especially interesting because simple rules governing the behavior of
+each particle can lead to complex behavior of the whole system. 
+
+
 
 
 \section{Introduction to the Framework}

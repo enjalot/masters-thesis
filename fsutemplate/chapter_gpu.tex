@@ -3,19 +3,46 @@
 \section{OpenGL}
 * basic introduction of OpenGL as standard cross-platform graphics library
 
+
 * talk about gpu hardware in relation to graphics, segway into GPGPU
+
 
 \section{General Purpose GPU Programming}
 
 * give motivations for GPGPU, brief history
 
-* compare with CUDA briefly
 
 * overview of GPU memory hierarchy
+
 
 * what kind of algorithms are good fit, performance primitives
 
 \section{OpenCL}
+
+* design goals
+    open standard
+    heterogeneous environment
+
+* concept of kernels 
+
+
+* talk about contexts and command queues briefly
+
+
+* compare with CUDA briefly
+
+
+\subsection{memory}
+* Brief overview of the different types of memory and their speeds
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.5]{figures/gpu_memory.png}
+		\label{fig:logic}
+        \caption{ Standard Memory Heirarchy Diagram }
+\end{figure}
+
+We pass data to the gpu and try to keep it there, no cost between kernels
+
 
 \subsection{float4}
 The OpenCL 1.0 specification defines the \verb|float4| type as a vector of four
@@ -30,8 +57,13 @@ the unused components of 3 dimensional vectors for storing some scalar values.
 \subsection{C++ Wrappers}
 * discuss wrappers provided by Khronos
 
+
+* our wrappers
+
+
 \subsection{CL/GL Interoperability}
 * sharing memory context to avoid transfer over PCI bus
+
 
 * issue on the mac, had to edit the header
 
