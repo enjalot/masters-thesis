@@ -2,11 +2,14 @@
 
 \section{The RTPS Library}
 
-In this section we discuss the various classes which make up the Real-Time Particle System framework. Filenames will be denoted as such \verb|rtps/RTPS.h| and refer to the directory structure of the code. \toi{link to code here? or reference?}
+In this section we discuss the various classes which make up the Real-Time
+Particle System framework. Filenames will be denoted as such \verb|rtpslib/RTPS.h|
+and refer to the directory structure of the code. \toi{link to code here? or
+reference?}
 
 \subsection{RTPS}
 
-The entry point into the framework is the \verb|rtps/RTPS.h| header file. This file defines
+The entry point into the framework is the \verb|rtpslib/RTPS.h| header file. This file defines
 the RTPS class which a user of the library will instanciate in order to run a
 particle based simulation. The Application Programmers Interface (API) is
 relatively simple, giving the user an object which only exposes two methods, a
@@ -35,20 +38,22 @@ while(true)
 
 \end{cppcode}
 
-The class is implemented in \verb|rtps/RTPS.cpp|.
+The class is implemented in \verb|rtpslib/RTPS.cpp|.
 
 \subsection{RTPSettings}
 
-The available settings are defined in \verb|rtps/RTPSettings.h| along with
-public getter and setter methods which allow parameters to be set after a
-settings object is instantiated. This is desirable since different systems will
-offer different combinations of settings and rather than creating, implementing
-and innevitably changing new constructors, the proper combination of settings
-can be set with calls to the setter functions. This is especially convenient
-when developing for a user interface such as in Blender where the configuration
-of settings is not known until runtime. 
-The \verb|RTPSettings| header file can be found in the Appendix
-\toi{link to Appendix and put header file in there}
+Options and parameters for the system are stored in a private STL Map object
+defined in \verb|rtpslib/RTPSettings.h| and accessed through public getter and
+setter methods. The available settings are not determined by this class, but by
+the implementation of each system. This is desirable since different systems
+will offer different combinations of settings and rather than creating,
+implementing and innevitably changing new constructors, the proper combination
+of settings can be set with calls to the setter functions. This is especially
+convenient when developing for a user interface such as in Blender where the
+configuration of settings is not known until runtime.  
+An example of specifying the available settings for SPH can be found in
+\verb|rtpslib/system/SPHSettings.h|.
+\toi{put a couple examples of getting and setting some settings here}
 
 
 \subsection{System}
@@ -111,6 +116,7 @@ integrating their SPH forces over time.
 
 \subsubsection{Particle Insertion}
 \toi{does this go here? seems like a good place}
+\subsubsection{Particle Deletion}
 
 \subsection{Collision Detection}
 
@@ -175,9 +181,32 @@ the programmer.
 
 \section{CMake}
 \toi{explain cmake structure and main features used}
+cross-platfrom build system used in many large open source projects.
+
+
+integrate with blender's build system as a subdirectory
+
 
 \section{OpenGL}
+* Render class
+
+
+* vertex buffer objects
+
+
+* Point sprites (billboards)
+
+
+
+
 \section{Blender source modification}
+* modfier: struct (dna/rna). User interface in python
+
+
+* $BL_ModifierDeformer.cpp$: apply and update routines
+
+
+* $RAS_Primatives$: detect modifier, bypass blender rendering and call rtps->render
 
 
 

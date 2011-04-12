@@ -7,6 +7,14 @@ defined by rules which act on those points. Most commonly used in graphics and
 video games to simulate special effects like fire, smoke, water and explosions
 particle systems are also used in computational fluid dynamics, astrophysics
 and materials science. 
+\begin{figure}[!htc]
+ 		%\centering
+        % this picture should be wordwrapped i think
+		\includegraphics[scale=0.5]{figures/pretty_particles.png}
+		\label{fig:logic}
+        \caption{ pretty particle system picture }
+\end{figure}
+
 
 
 All particle systems share some fundamental properties, first they must be able
@@ -70,6 +78,29 @@ designed an object oriented software framework for general particle systems.
 The primary motivation for this is to avoid duplicating work when creating
 different simulations.
 
+
+We first define an interface for the user of the particle system to interact
+with, the \verb|RTPS| class. This class initializes a particle system with some
+initial settings and exposes functions to update and render the particles. It
+also allows access to it's internal system object, which has functions for
+interacting with the system directly. These functions are general for all
+systems, but may be implemented differently by different types of systems. For
+example inserting particles to the system, or setting up a "hose" which will
+spray particles.
+
+
+The rendering of particles is handled separately from the simulation so that
+different particle systems may take advantage of the available rendering
+classes. It is also easy to add a new way of rendering by defining a new
+rendering class derived from the \verb|Render| class.
+
+
+Someone wishing to add a new type of particle system does not have to spend
+much energy on infrastructure but can rather focus on implementing the rules
+which govern the behavior of their particles, or adding new functionality to
+interface with some external projects. Since the framework is designed for use
+in educational gaming it is likely that users will want to integrate particles
+into their existing game mechanics.
 
 
 
