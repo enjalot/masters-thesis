@@ -1,17 +1,150 @@
 \chapter{Fluid Simulation}
 
+\section{Computational Fluid Dynamics}
+
+The study of simulating fluids is known as Computational Fluid Dynamics, which
+encompasses mathematical models for fluid behavior and numerical methods for
+implementing these models. The most well known model for describing the
+behavior of fluids is given by the Navier-Stokes equations. These equations
+model a fluid by considering the physical quantities mass-density, pressure and
+velocity as continuous fields and describing their relationships over time with
+differential equations.
+
+
+The numerical methods for solving these differential equations are many and
+varied. These methods can usually be classified as one of two types, Eulerian
+and Lagrangian. Eulerian methods describe a fluid in terms of space, while
+Lagrangian methods describe a fluid in terms of material. Essentially, in an
+Eulerian method one looks at a region in space and watches how much fluid moves
+in and out of the region, whereas in a Lagrangian method one watches the
+material properties of a small volume of fluid and tracks its movement through
+space.
+
+
+In general, an Eulerian method will discretize an area of space with a grid,
+where each grid cell will represent a small volume through which a fluid can
+pass. The accuracy of Eulerian methods is largely dependant on the resolution
+of this grid, by using more and smaller cells one will generally end up with a
+more accurate result. This presents a problem when one considers that the grid
+must be stored in the limited memory of a computer, so there is a cost to
+making a higher resolution grid. This cost is compounded if only a relatively
+small area of the grid contains fluid, naturally one would want to use more
+smaller cells in that area and not store the unused cells in other parts of the
+domain. Another related concern is when a fluid undergoes a large deformation
+where more resolution is necessary to accurately resolve the behavior, one
+would like to dynamically provide higher resolution in the area of the
+deformation while leaving the rest of the grid intact.
+While many Eulerian methods address these concern with adaptive mesh techniques,
+the computational costs involved are not ammenable to real-time simulations. 
+
+
+Lagrangian methods have a natural way to remove dependence on a spatial grid,
+since they are based in the material description of the fluid. A common way to
+keep track of the material properties of a fluid in a Lagrangian method is by
+using particles, where each particle has a location in space, represents a
+volume of fluid and stores material properties. Particles then interact with
+each other over time, transfer material properties and are moved in space
+according to forces determined by the method. Since the location of the
+particles is not fixed, and the fluid is represented only by the particles, the
+problem of limited storage is seperated from the problem of resolution. With
+particle based methods resolution is increased by adding more particles, but
+without the spatial restriction.
+
+
+
+\section{Navier-Stokes}
+
+The Lagrangian formulation of the Navier-Stokes equation for an incompressible
+isothermal viscous fluid is given by the following equations: \\
+1) The continuity equation:
+$$
+\frac{d\rho}{dt} = -\rho \grad \cdot v
+$$
+Where $\rho$ represents the density of the fluid and $v$ represents the velocity.\\
+
+
+2) The momentum equation:
+$$
+\frac{dv}{dt} = -\frac{1}{\rho}p + \frac{\mu}{\rho} \nabla^2 v + f
+$$
+Where $\mu$ represents the dynamic viscosity and $f$ represents external forces (such as gravity).
+
+
 \section{Smoothed Particle Hydrodynamics}
+
+The key idea behind Smoothed Particle Hydrodynamics lies in the integral
+approximation of a field function. The integral representation of a field
+function, $A$ is given by: 
+$$
+A(r) = \int_\Omega A(r')W(r-r', h)dr'
+$$
+
+Here $r$ is a point in space, and $W$ is a kernel function with a smoothing radius
+$h$, and $\Omega$ is the volume that contains $r$. If $W$ is the Dirac Delta
+function, the integral representation reduces to the exact value of $A(r)$,
+otherwise it is known as a kernel approximation.
+
+The integral representation can be discretized by a particle approximation, which is the summation of particles in a neighborhood:
+$$
+A(r_i) = \sum_j A_j V_j W(r_i-r_j, h)
+$$
+Where $A_j$ is the field value at coordinate $r_j$ and $V_j$ is the volume of
+particle j. It is important to note that for a fluid, the volume of a particle is given by
+its mass divided by its density:
+$$
+V = \frac{m}{\rho}
+$$
+The particle approximation of a field function in SPH is given by:
+$$
+A(r_i) = \sum_j \frac{m_j}{\rho_j} A_j W(r_i - r_j, h)
+$$ 
+The gradient of a field function is given by:
+$$
+\nabla A(r_i) = \sum_j \frac{m_j}{\rho_j} A_j \nabla W(r_i - r_j, h)
+$$
+Since $A_j$ is assumed constant in the volume $V_j$, only the kernel function
+$W$ is affected by the gradient. Similarly the Laplacian of a field function is
+given by:
+$$
+\nabla^2 A(r_i) = \sum_j \frac{m_j}{\rho_j} A_j \nabla^2 W(r_i - r_j, h)
+$$
+
+
+
+\subsection{Kernel Functions}
+
+The kernel functions used in the integral representations have a large impact
+on the accuracy and consistency of the method. Kernel functions and their
+derivatives must have compact support, having a value of 0 outside of the
+smoothing radius. The behavior of the kernel functions and their derivatives
+can also strongly impact the behavior of the particles, so care is taken when
+selecting a kernel.
+
+The following kernels were selected for their performance in \cite{Krog}
+Wpoly6
+
+dWSpiky  %\cite{Desbrun1996}
+
+ddWvisc   
+
+
 
 \subsection{Formulation}
 
 Navier-Stokes
 
 Continuity
+
 Momentum
+symmetric gradient
+
 Time integration
 
 \subsection{Boundary Conditions}
+krog repulsion force
 \subsection{Collisions}
+collision detection
+repulsion force
 
 
 \section{Initialization}
