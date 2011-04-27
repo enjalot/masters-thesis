@@ -65,7 +65,7 @@ Where $\rho$ represents the density of the fluid and $v$ represents the velocity
 
 2) The momentum equation:
 $$
-\frac{dv}{dt} = -\frac{1}{\rho}p + \frac{\mu}{\rho} \nabla^2 v + f
+\frac{dv}{dt} = -\frac{1}{\rho}P + \frac{\mu}{\rho} \nabla^2 v + f
 $$
 Where $\mu$ represents the dynamic viscosity and $f$ represents external forces (such as gravity).
 
@@ -110,6 +110,55 @@ $$
 $$
 
 
+\subsection{Formulation}
+
+Applying the SPH approximations to the Lagrangian formulation of the
+Navier-Stokes equations is done in two steps. By keeping the mass fixed for each
+particle the continuity equation can be omitted, instead the density of each particle is approximated.
+$$
+\rho_i = \sum_j \rho_j \frac{m_j}{\rho_j} W(r_i - r_j, h)
+$$
+Which can be simplified to
+$$
+\rho_i = \sum_j m_j W(r_i - r_j, h)
+$$
+\\
+\\
+The momentum equation
+$$
+\frac{dv}{dt} = -\frac{1}{\rho}P + \frac{\mu}{\rho} \nabla^2 v + f
+$$
+can be separated into three components on the right hand side
+$$ \frac{dv}{dt} = F^{pressure} + F^{viscosity} + f^{external} $$
+with
+$$
+F^{pressure} = -\frac{1}{\rho}P
+$$
+and
+$$
+F^{viscosity} = \frac{\mu}{\rho} \nabla^2 v
+$$
+To approximate the pressure force an equation of state is used to give weak
+compressibility, rather than solve the Poisson pressure equation for near
+incompressibility due to computational cost.
+The equation of state is given as 
+$$
+P = k(\rho - \rho_0)
+$$
+Where $k$ is a gas stiffness constant and $\rho_0$ is the rest density.
+The pressure term can be approximated as
+$$
+F^{pressure}_i = -\frac{1}{\rho_i} \sum_j P_j \frac{m_j}{\rho_j} \nabla W(r_i - r_j, h)
+$$
+However this does not produce a symmetric force and violates the action-reaction law. A symmetric approximation of the gradient is used instead
+$$
+F^{pressure}_i = -\frac{1}{\rho_i} \sum_j \frac{P_i + P_j}{2} \frac{m_j}{\rho_j} \nabla W(r_i - r_j, h)
+$$
+The SPH formulation of the viscosity term is given as follows
+$$
+F^{viscosity}_i = \frac{\mu}{\rho_i} \sum_j (v_j - v_i) \frac{m_j}{\rho_j} \nabla^2 W(r_i - r_j, h)
+$$
+
 
 \subsection{Kernel Functions}
 
@@ -120,36 +169,115 @@ smoothing radius. The behavior of the kernel functions and their derivatives
 can also strongly impact the behavior of the particles, so care is taken when
 selecting a kernel.
 
-The following kernels were selected for their performance in \cite{Krog}
-Wpoly6
+The following kernels were selected for their performance in \cite{Krog}.
+\\
+For density approximation the $W_{poly6}$ kernel is used
+$$
+W_{poly6}(r, h) = \frac{315}{64 \pi h^9} 
+\begin{cases}
+    (h^2 - |r|^2)^3 & \text{$0 \le |r| \le h$}
+    \\
+    0 & \text{$otherwise$}
+\end{cases}
+$$
 
-dWSpiky  %\cite{Desbrun1996}
+For the pressure term the gradient of the  $W_{spiky}$ kernel is used
+$$
+W_{spiky}(r, h) = \frac{15}{\pi h^6} 
+\begin{cases}
+    (h - |r|)^3 & \text{$0 \le |r| \le h$}
+    \\
+    0 & \text{$otherwise$}
+\end{cases}
+$$
+with the gradient given by
+$$
+\nabla W_{spiky}(r, h) = -\frac{45}{\pi h^6} \frac{r}{|r|}
+\begin{cases}
+    (h - |r|)^2 & \text{$0 \le |r| \le h$}
+    \\
+    0 & \text{$otherwise$}
+\end{cases}
+$$
 
-ddWvisc   
+For the viscosity term the Laplacian of the $W_{viscosity}$ kernel is used
+$W_{viscosity}$   
+$$
+W_{viscosity}(r, h) = \frac{315}{2 \pi h^3} 
+\begin{cases}
+    -\frac{|r|^3}{2h^3} + \frac{|r|^2}{h^2} + \frac{h}{2|r|} - 1 & \text{$0 \le |r| \le h$}
+    \\
+    0 & \text{$otherwise$}
+\end{cases}
+$$
+with the Laplacian given by
+$$
+\nabla^2 W_{viscosity}(r, h) = \frac{45}{\pi h^6}
+\begin{cases}
+    h - |r| & \text{$0 \le |r| \le h$}
+    \\
+    0 & \text{$otherwise$}
+\end{cases}
+$$
 
 
-
-\subsection{Formulation}
-
-Navier-Stokes
-
-Continuity
-
-Momentum
-symmetric gradient
-
-Time integration
-
-\subsection{Boundary Conditions}
-krog repulsion force
 \subsection{Collisions}
-collision detection
-repulsion force
+
+Collisions are handled by exerting a repulsion force on particles which collide
+with a surface. The repulsion force is given by
+$$
+F^{repulsion} = (stiffness * distance - dampening * n \cdot v))*n;
+$$
+where $n$ is the normal of the surface, $v$ is the velocity of the particle,
+$distance$ is the distance of the particle to the surface and
+stiffness and dampening are user defined parameters to control the behavior of
+the repulsion force.\cite{Krog}
+
+\subsubsection{Domain}
+For convenience the fluid is considered to exist in a domain, where each wall
+of the domain is a surface against which the particles can collide. The walls
+are defined as minimum or maximum values in each axis, with a corresponding
+normal along the axis pointing inside the domain. 
+
+\subsubsection{Triangles}
+
+Collisions with arbitrary triangles are calculated are performed by using an
+algorithm for interescting a line segment with a triangle from \cite{Ericson}. The line segment is
+created by adding the velocity scaled by a distance parameter to the particle
+position. The technique uses barycentric coordinates to test if the point where
+the segment intersects with the plane of the triangle is within the triangle.
+The implemented routine is given in Apendix X.
+
+%\cite{Ericson} %Real-Time collision detection pp 191
 
 
-\section{Initialization}
-\subsection{Insertion}
-\subsection{Parameters}
+\section{Integration}
 
+The SPH method provides the forces which describe the change in velocity over
+time. Two modifications are made to these forces to increase stability. The
+first is a speed limit, which clamps the magnitude of the force to a user defined speed.
+$$
+F = \begin{cases} s * \frac{F}{|F|} & \text{if $|F| > s$}
+    \\
+    F & \text{$otherwise$}
+\end{cases}
+$$
+where $s$ is the user defined speed limit and $F$ is the force vector.
 
+The second modification is a smoothing of the velocity given by
+$$
+v_i = v_i + \epsilon \sum_{j \ne i} 2m_j \frac{(v_j - v_i)}{(\rho_i + \rho_j)} W(r_i - r_j, h)
+$$
+where $\epsilon$ is a user defined parameter between $0$ and $1$.
+
+\subsection{Time Integration}
+To advect the particles in time, the second order Leap-Frog integration method
+is used. The new position and velocity each time step is given by
+$$
+x_{i+1} = x_i + v_i dt + \frac{a_i}{2} dt^2
+$$
+$$
+v_{i+1} = v_i + \frac{(a_i + a_i+1)}{2} dt
+$$
+where $i$ denotes the current timestep, $x$ is the position vector, $v$ is the velocity vector and $a$ is the acceleration vector.
 
