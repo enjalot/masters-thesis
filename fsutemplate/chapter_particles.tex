@@ -7,6 +7,7 @@ defined by rules which act on those points. Most commonly used in graphics and
 video games to simulate special effects like fire, smoke, water and explosions
 particle systems are also used in computational fluid dynamics, astrophysics
 and materials science. 
+\begin{comment}
 \begin{figure}[!htc]
  		%\centering
         % this picture should be wordwrapped i think
@@ -14,6 +15,7 @@ and materials science.
 		\label{fig:logic}
         \caption{ pretty particle system picture }
 \end{figure}
+\end{comment}
 
 
 
@@ -55,12 +57,17 @@ The simplest way of computing this is called Euler's method, which takes the
 velocity at the previous timestep, and adds the force multiplied by the
 timestep. The new velocity is then multiplied by the timestep and added to the
 position at the previous timestep to obtain the new position.
+
+\begin{comment}
 \begin{figure}[!htc]
  		\centering
 		\includegraphics[scale=0.5]{figures/eulers_method.png}
 		\label{fig:logic}
         \caption{ A Particle moving according to forces }
 \end{figure}
+show a particle's path over time with dotted previous particles. have a reference curve which is the velocity function
+we should end up with a streamline where the viewer can see the state at each previous timestep
+\end{comment}
 
 
 Particle systems are especially interesting because simple rules governing the behavior of
@@ -98,9 +105,9 @@ rendering class derived from the \verb|Render| class.
 Someone wishing to add a new type of particle system does not have to spend
 much energy on infrastructure but can rather focus on implementing the rules
 which govern the behavior of their particles, or adding new functionality to
-interface with some external projects. Since the framework is designed for use
-in educational gaming it is likely that users will want to integrate particles
-into their existing game mechanics.
+interface with some external projects. It is likely that users will want to
+integrate particles into their existing game mechanics, and the framework has
+been designed with this in mind.
 
 
 

@@ -135,6 +135,17 @@ integrating their SPH forces over time.
 
 
 \section{OpenCL}
+
+The framework provides several classes to abstract access to OpenCL routines.
+The underlying OpenCL functionality is provided by the Khronos C++ header files
+as discussed in Chapter 3 (GPU Computing).\toi{need to be able to link to a chapter}
+The purpose of these classes is convenience for the developer, hiding tedious
+and repetitive behavior and providing sensible default behavior. The classes
+are not intended to be a general replacement for the official OpenCL interface,
+and focus primarily on the functionality required in this project.
+
+
+
 \subsection{CLL}
 * class which instanciates opencl
 
@@ -209,6 +220,31 @@ integrate with blender's build system as a subdirectory
 
 
 \section{Blender source modification}
+
+In order to use the RTPS library inside the Blender Game Engine the source code
+for Blender must be modified. The manner in which RTPS is exposed to Blender is
+through a construct known as a Modifier. The purpose of a Blender Modifier is
+to enable custom functionality on a Blender Object, usually resulting in a
+modification of the Object's data. In the Blender Game Engine all modifiers on an Object are
+$Applied$ at the start of a game and are $Updated$ every frame. The definition
+of $Apply$ and $Update$ depend on the Modifier, and in the case of RTPS it is
+desirable to instanciate the particle system when the Modifier is $Applied$ and
+to calculate the next timestep when $Updated$.
+
+
+Blender Modifiers are specified using the Blender DNA system, using a C
+structure to store associated data. A Modifier's data can be exposed to the Blender User Interface
+through Blender's Data API and Python scripting interface. The Blender Data API
+is a way to programmatically access data structures used by Blender without
+needing to know the details of how they are stored.\cite{b3dDataAPI} The User
+Interface for Blender is controlled with Python, and the Python/RNA API gives
+access to the Data API so that the values and functionality of a data structure
+can be manipulated in the User Interface.
+
+
+
+For a complete list of Blender source files modified by the project please refer to Appendix X\toi{link to an appendiex with MODIFIED FILES}
+
 * modfier: struct (dna/rna). User interface in python
 
 
