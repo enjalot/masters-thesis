@@ -219,7 +219,7 @@ integrate with blender's build system as a subdirectory
 
 
 
-\section{Blender source modification}
+\section{Blender Source Modification}
 
 In order to use the RTPS library inside the Blender Game Engine the source code
 for Blender must be modified. The manner in which RTPS is exposed to Blender is
@@ -244,16 +244,109 @@ Blender's internal architecture is available at
 \url{http://www.blender.org/development/architecture/}}
 
 
+\subsection{User Interface}
+%screenshot
+For this project the $RTPS Modifier$ was created.\cite{enjaCustomModifier} The
+data stored in the modifier are the configurations and run-time options for the
+RTPS library.  These options are exposed to the game designer in a panel and
+displayed according to a Python script which calls the RNA API. The RNA code
+specifies aspects of the user interface such as the minimum and maximum values
+allowed for an input, or the options available in a drop-down menu. The
+appearance of the user interface elements is automatically created using the
+defaults provided by Blender, which are suitable for the current configuration.
 
+
+\subsection{Apply}
+The values from the User Interface are passed to the RTPS library when the
+Modifier is Applied at the start of the game. The control flow is as follows,
+the Game Engine iterates through all of the objects in the scene and if the
+object has a Modifier the Modifier's apply routine is called. This logic is
+extended to check explicitly for the $RTPS Modifier$, and if present initialize
+an RTPS instance.
+
+
+The initialization involves passing in the values of the Modifier struct to the
+RTPS settings instance as well as constructing a Domain object from the Axis
+Aligned bounding box of the object which the Modifier is Applied to.
+
+\subsection{Update}
+
+The Update routine works similarly to the Apply routine with respect to control
+flow. The Update routine is called for every frame of the game, rather than
+only once at the start. In addtion to calling the update routine of the RTPS
+instance, this is where most of the interaction between the Game Engine and the
+library takes place.
+
+\subsubsection{Collision}
+Objects to be used for collision detection are dealt with in the update routine
+by checking for a specific game property. If the boolean value of the
+$collider$ property is true the faces of the object will be collected in a
+vector and passed to the RTPS instance as Triangle objects. This does assume
+that the mesh of the object is composed purely of Triangles. 
+
+\subsubsection{Emission}
+Objects which emit particles are also handled in the Update routine. The
+objects are detected and handled depending on which Game Properties are
+present. Currently there are two types of emitters, Blob and Hose. A Blob
+emitter will fill a user specified box with a user specified amount of
+particles. The spacing of the particles is determined by the relation of the
+particle radius to the domain size. This means that a user may attempt to fill
+the volume with more particles than will fit, in which case only the number of
+particles which fit will be emitted. If the user requests to emit more
+particles than the maximum allowed, no particles will be emitted.
+The Blob emitter is determined in blender by the presence of the $num$
+property. Every frame, if the $num$ property is greater than zero, $num$
+particles are emitted from the volume given by the Object's Axis Aligned
+Bounding Box and the $num$ is set to zero. In this way it is possible to
+provide interactive emissions of particles by using the Logic Bricks to change
+the $num$ property during game play.
+%screenshot
+
+The Hose emitter will spray a stream of particles in the direction and speed of
+a user specified velocity vector. The radius of the nozzle is specified as a
+multiple of the particle spacing. The Hose has a set number of particles it
+will emit, and each frame a disc of particles is emitted at a rate proportional
+to the time step and the velocity. The number of particles emitted each frame
+is subtracted from the total number available to the Hose until there are no
+more particles left, at which point the Hose will stop spraying. The positions
+of the particles emitted in the disc are also slightly randomized (by one
+particle spacing) along the velocity vector as well as along the plane of the
+disc, giving a more natural depiction of spray.
+
+A Hose is specified by the presence of the boolean $hose$ game property. The
+value of the $hose$ property determines whether or not the Hose is activated.
+The rest of the functionality for the Hose is controlled by the $num$, $radius$
+and $speed$ properties. The $num$ property specifies the total amount of
+particles available to the hose, the $speed$ property gives the initial
+velocity of the particles emitted from the hose while the $radius$ determines
+how wide the Hose is. The direction of the Hose is determined by the
+orientation of the Y axis of the Hose Object.
+
+\subsection{Orientation}
+In Blender Objects are positioned in a Global coordinate system, with data
+(such as vertices) specified in a Local coordinate system relative to the
+Object's center. In the RTPS library particles are positioned in a coordinate
+system relative to the Domain. In order for Blender and RTPS objects to
+interact it is essential that objects can be represented in one of the two
+coordinate systems. This is accomplished by using Blender's Global coordinate
+system when passing information from Blender to RTPS. To use the Global
+coordinate system for an Object, one multiplies a given local coordinate by the
+Global Rotation and Transformation matrices maintained by the Game Engine for
+the Object. This is done for the Domain, as well as Collider and Emitter
+Objects, making all spatial coordinates in RTPS the Blender Global coordinates.
+
+%screenshot
+\subsection{Render}
+Rendering of the RTPS particles in the Blender Game Engine is accomplished by
+taking control of the way the Object with the $RTPS Modifier$ is displayed. The
+Game Engine manages a list of all Objects to be rendered and calls various
+OpenGL rasterization routines depending on properties and materials of the
+Object. In order to render the RTPS particles the $render$ method of the RTPS
+instance must be called. In the Game Engine rasterization code a conditional
+statement was added to check for the presence of the $RTPS Modifier$, and if
+present the normal rendering is bypassed and the $render$ routine of the RTPS
+instance is called instead.
+
+\subsection{Files}
 For a complete list of Blender source files modified by the project please refer to Appendix X\toi{link to an appendiex with MODIFIED FILES}
-
-* modfier: struct (dna/rna). User interface in python
-
-
-* $BL_ModifierDeformer.cpp$: apply and update routines
-
-
-* $RAS_Primatives$: detect modifier, bypass blender rendering and call rtps->render
-
-
 
