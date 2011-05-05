@@ -83,7 +83,7 @@ logic since it makes printing output much simpler.
 There is also the \verb|int4| struct which is similarly a vector of four integers
 for more convenient communication with OpenCL.
 the declarations and definitions for these structures and related functions can
-be found in \verb|rtps/structs.h| and \verb|rtps/structs.cpp|
+be found in \verb|rtpslib/structs.h| and \verb|rtpslib/structs.cpp|
 
 
 \subsection{Domain}
@@ -200,23 +200,69 @@ be printed and manipulated using all of the familiar CPU functions available to
 the programmer. 
 
 \section{CMake}
-\toi{explain cmake structure and main features used}
-cross-platfrom build system used in many large open source projects.
+CMake is a cross-platform, open-source build system.\cite{CMake} CMake
+abstracts the process of generating Makefiles for the compilation of large
+projects. This abstraction handles the differences between operating systems
+and compilation toolchains. CMake is used in this project to compile and link
+the library as well as standalone test applications. By using CMake the project
+can be compiled with relative ease on Windows, Linux and Mac OS X.
 
 
-integrate with blender's build system as a subdirectory
+CMake is also used by the Blender project as one of the supported build systems
+for compiling the Blender software. This was a strong motivation behind using
+CMake for the RTPS library. Since both projects use CMake it is relatively
+straightforward to integrate the two. This is accomplished by placing the RTPS
+library in a subdirectory of the Blender source tree and changing the Blender
+$CMakelists.txt$ file to add the subdirectory. With this configuration
+compiling Blender will also compile the RTPS library. By adding a few more
+modifications to the Blender CMake configurations RTPS could be included and
+linked against in Blender source code.
+
 
 
 \section{OpenGL}
-* Render class
+
+Rendering of the simulation is controlled by the \verb|Render| class or one of
+its subclasses. The \verb|Render| class provides basic OpenGL rendering
+functionality through the use of \verb|Vertex Buffer Objects| (VBO), which are OpenGL
+Buffer types for storing coordinate based information. With the use of
+OpenCL/OpenGL context sharing the positions of particles and their associated
+color can be stored in a VBO and manipulated as OpenCL buffers without copying
+or transfering data. The \verb|Render| class is passed in the OpenGL address
+for the position and color VBOs as well as the RTPS settings object which
+contains settings related to the rendering. The Render class is defined in
+\verb|rtpslib/render/Render.h|.
 
 
-* vertex buffer objects
+\subsection{Points}
+The most basic form of rendering provided simply displays each particle as a
+filled in circle with a fixed radius. This rendering allows the developer to
+see the behavior of the fluid with minimal overhead. The rendering is
+accomplished using the OpenGL function $glDrawArrays$ with the \verb|GL_POINTS|
+option and specifying the position and color VBOs with $glVertexPointer$ and
+$glColorPointer$ respectively. The Point rendering functionality is implemented
+in \verb|rtpslib/render/Render.cpp|
+
+\subsection{Point Sprites}
+A common way to render particles is with a technique known as $billboarding$.
+In this technique a small texture is rendered to a quad which is always aligned
+to be perpendicular with the camera. With this technique it is possible to
+improve upon the point rendering as well as fake some volumetric effects with
+low computation cost.
 
 
-* Point sprites (billboards)
+The \verb|SpriteRender| class implements billboarding using the
+\verb|GL_POINT_SPRITE| functionality in OpenGL which will create a textured quad
+of a specified size centered at each coordinate in the position VBO. GLSL
+vertex and fragment shaders are used to manipulate the appearance of the point
+sprites. The default shaders use artificial lighting to fake the appearance of
+spheres. Another set of shaders is provided in the code for loading of an image
+for use as a texture on the billboards. The \verb|SpriteRender| class inherits
+from \verb|Render| and overrides the $render$ function. The class is
+implemented in \verb|rtpslib/render/SpriteRender.cpp| and the shaders are in
+\verb|rtpslib/render/shaders|.
 
-
+\toi{Add in a blurb about Andrew's Surface Rendering? how to cite him?}
 
 
 \section{Blender Source Modification}
@@ -246,7 +292,7 @@ Blender's internal architecture is available at
 
 \subsection{User Interface}
 %screenshot
-For this project the $RTPS Modifier$ was created.\cite{enjaCustomModifier} The
+For this project the \verb|RTPS Modifier| was created.\cite{enjaCustomModifier} The
 data stored in the modifier are the configurations and run-time options for the
 RTPS library.  These options are exposed to the game designer in a panel and
 displayed according to a Python script which calls the RNA API. The RNA code
@@ -261,7 +307,7 @@ The values from the User Interface are passed to the RTPS library when the
 Modifier is Applied at the start of the game. The control flow is as follows,
 the Game Engine iterates through all of the objects in the scene and if the
 object has a Modifier the Modifier's apply routine is called. This logic is
-extended to check explicitly for the $RTPS Modifier$, and if present initialize
+extended to check explicitly for the \verb|RTPS Modifier|, and if present initialize
 an RTPS instance.
 
 
@@ -338,12 +384,12 @@ Objects, making all spatial coordinates in RTPS the Blender Global coordinates.
 %screenshot
 \subsection{Render}
 Rendering of the RTPS particles in the Blender Game Engine is accomplished by
-taking control of the way the Object with the $RTPS Modifier$ is displayed. The
+taking control of the way the Object with the \verb|RTPS Modifier| is displayed. The
 Game Engine manages a list of all Objects to be rendered and calls various
 OpenGL rasterization routines depending on properties and materials of the
 Object. In order to render the RTPS particles the $render$ method of the RTPS
 instance must be called. In the Game Engine rasterization code a conditional
-statement was added to check for the presence of the $RTPS Modifier$, and if
+statement was added to check for the presence of the \verb|RTPS Modifier|, and if
 present the normal rendering is bypassed and the $render$ routine of the RTPS
 instance is called instead.
 
