@@ -101,16 +101,6 @@ The \verb|Domain| class is found in \verb|rtps/domain/Domain.h| and
 particles at regularly spaced intervals based on grid parameters.
 
 
-
-\section{SPH Routines}
-
-The update function for the Smoothed Particle Hydrodynamic simulation can be
-broken down into three distinct parts. The first is the Nearest Neighbor search
-which computes the SPH forces for each particle in an efficient manner, the
-second is the handling of collisions with the domain boundary as well as with
-arbitrary triangular meshes, and the third is advecting the particles by
-integrating their SPH forces over time. 
-
 \section{Nearest Neighbor Search}
 The Nearest Neighbor Search (NNS) is essential to the SPH simulation because it
 allows for the efficient updating of a particle's forces based on surrounding
@@ -143,7 +133,7 @@ The hash is calculated as follows:
 int gx = cell_index.x
 int gy = cell_index.y
 int gz = cell_index.z
-hash = (gz*grid_res.y + gy) * grid_res.x + gx;
+int hash = (gz*grid_res.y + gy) * grid_res.x + gx;
 \end{verbatim}
 
 Where \verb|grid_res| is an \verb|int4| containing the number of cells in each dimension.
@@ -151,7 +141,7 @@ Where \verb|grid_res| is an \verb|int4| containing the number of cells in each d
 
 The hash for each particle is stored in an integer array by the \verb|Hash|
 class defined in \verb|rtpslib/system/common/Hash.cpp| with the OpenCL kernel
-implemented in \verb|rtpslib/system/common/cl_src/hash.cl|
+implemented in \\ \verb|rtpslib/system/common/cl_src/hash.cl|
 
 \subsubsection{Sort}
 The hash array is then sorted using the Bitonic Sort implementation provided by
@@ -211,13 +201,51 @@ the index of a neighboring particle. The code for the previous two routines is
 contained in a header file which is included by the kernel which implements the
 ForNeighbor function. This allows for kernels with different functionality to
 reuse the neighbor search code. Different kernels may require access to
-different arrays 
+different arrays within the ForNeighbor routine, in order to pass different
+arguments through all three routines \verb|#define| macros are used to specify
+the arguements of each function and the values passed through. An example of
+this is provided in Appendix X \toi{link to appendix with density kernel}.
 
 \section{Particle Insertion and Deletion}
+Particles can be dynamically inserted into and deleted from the simulation by
+taking advantage of the hashing and sorting functionality. The number of
+particles in the system is kept track of by the \verb|SPH| instance.
+Calculations in the simulation are only done on the first $num$ elements of the
+relevant arrays (such as position, velocity, force etc.) where $num$ is the
+current number of particles. The values in the position array for indices
+greater than $num$ is set to a location that will always place them outside of
+the grid (e.g. a positive multiple of the grid max). Any particle outside of
+the grid will receive a hash value greater than the maximum hash value, thus
+when the particle array is sorted, the active particles are always first in the
+array. 
 
-\section{SPH Calculations}
+\subsection{Insertion}
+Particles are inserted by setting the values of the position, velocity and
+color arrays immediately after the $num$ index and incrementing $num$ by the
+number of particles added. When the particles are sorted, the new particle
+positions will be inside the active grid and will be part of the new $num$ of
+particles to be used in the simulation.
+
+\subsection{Deletion}
+Deletion of particles is accomplished by moving particles outside of the grid.
+When the \verb|Hash| kernel calculates the hash for a particle which falls
+outside of the grid it assigns the maximum hash value to that particle.
+The $num$ of active particles is updated by taking advantage of the
+\verb|CellIndices| kernel. The value of the element at the maximum hash value
+of the \verb|cell_indices_start| after the \verb|CellIndices| kernel execution
+gives the start index of the particles outside the grid and conversly the
+number of particles which are inside the grid. The number of particles is then
+set to this value and the deleted particles are no longer used in the
+simulation.
+
+
+\section{Force Calculations}
+The force calculations defined by the SPH formulation are implemented in three
+distince phases, density, force and collision.
 
 \subsection{Density}
+The density of each particle is calculated by the summation over its neighbors
+as given by the SPH formulation. 
 
 \subsection{Force}
 
@@ -225,7 +253,8 @@ different arrays
 \subsection{Collision Detection}
 
 
-\subsection{Integration}
+
+\section{Integration}
 
 
 
