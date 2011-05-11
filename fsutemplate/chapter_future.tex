@@ -1,43 +1,97 @@
 \chapter{Future Work}
 
 \section{Optimization}
-Improved neighbor search following Steve's method (Z indexing)
+
+The project demonstrates real-time performance on modern graphics hardware,
+however there is always room for improvement. Several bottlenecks in the code
+have known methods for speedups. Possibly the greatest speedup would involve
+improving the neighbor search. A technique known as Z-indexing would allow for
+neighbor lookups without storing the cell-indices array and consequently
+cutting a significant amount of memory accesses.\cite{Goswami2010}
 
 
-More efficient sort
+Another known bottle neck is the sorting algorithm used in the process of
+preparing the neighbor search. Researchers have demonstrated a highly efficient
+implementation of the Radix sort in CUDA\cite{Merrill:Sorting:2010} which can be ported to OpenCL.
 
 
-triangle collisions calculated using an efficient data structure rather than brute force
+Collision detection is currently implemented in a brute force manner. Data
+structures must be invesitigated which can handle particle collisions with
+objects at various scales. One such data structure is Heirarchical Spatial
+Subdivision, an extension of the current grid-based method for particle
+interaction.\cite{Pouchol2009} Triangle based collisions are desirable for
+their ability to handle general objects but are not neccessary for all use
+cases. Implementing various collision primitives such as spheres, cylinders and
+axis aligned bounding boxes will allow for interesting interactions in game
+play at a lower performance cost. 
 
 
 \section{Rendering}
-real-time rendering of a surface
+For the purpose of fluid effects in a game, it is important to consider how the
+fluid is displayed. This is especially difficult in real-time, as traditional
+rendering methods such as marching cubes have not yet been implemented at
+suitable speeds.
+Two approaches are being considered, first a screen-space technique which uses
+curvature flow to give the impression of a fluid surface.\cite{VanderLaan2009}
+Another approach is to extract the surface particles using data from the
+simulation and performing GPU raycasting on the much smaller subset of
+points.\cite{Goswami2010} Volume rendering techniques for the GPU have received
+increasing interest and may present an opportunity for real-time
+rendering.\cite{Fraedrich2010}
 
+
+It is also desirable to support effects for other kinds of fluids such as smoke
+and other particle system effects such as fire. For these techniques a variety
+of blending modes and custom textures must be made available to the user.
+Sorting particles with respect to depth from the camera is an essential task
+for enabling proper alpha blending used by some of these effects.
 
 \section{Blender}
-* improved integration with blender, making a game engine particle class and
-eventually extend existing particles
+
+The current integration with Blender gives a solid foundation for future
+improvements. One important goal is to move the user interface from the
+Modifiers to its own Particle System panel. This is desirable from the
+perspective of current Blender users who are already familiar with the existing
+particle system. Along these lines, another goal is to integrate with the
+existing particle system as much as possible, both in user interface as well as
+functionality.
+Further improvements to the user interface will include a special modifier for
+emitting particles from objects, eliminating the error prone and tedius method
+of adding custom game properties. 
 
 
-Interaction with rigid bodies using Bullet physics
+Another important goal is the creation of a Python interface to the RTPS
+library within Blender and the Game Engine. Python scripting gives the game
+designer powerful control over the behavior of their game and exposing RTPS
+functions to Python will allow for new and creative uses. 
 
 
-Modifiers for various emitters
-
+Currently collision detection and interaction with objects in the Game Engine
+do not use all of the available functionality present. The code could be made
+cleaner by utilizing existing classes for interacting with Objects as well as
+improved communication with the Bullet physics engine.  
 
 \section{SPH}
-Improvements to SPH method including surface tension, smoothing of field variables
+
+There are a host of improvements which can be made to the simulator itself,
+including better physical accuracy, more physical phenomena and interesting
+combinations of effects.
+There are several features available in the literature which can be readily
+implemented such as smoothing of field variables and improved smoothing kernels for better
+stability\cite{Liu2010}, surface tension and visco-elastic
+effects for more convincing and varied fluids\cite{Clavet2005}. Simulating
+multiple fluids interacting at once as well as phase changes based on
+temperature is also desirable.\cite{Muller2005} SPH can also be extended to
+simulate granular materials such as sand.\cite{Bell2005}
 
 
-semi-analytic collision calculations \cite{Manenti2011} \cite{Harada2007}
-
-Adding granular materials
-
-
-Unifying with particle based solid methods to implement melting and freezing states.
-
-
-Adaptive methods for improved performance
+A very important goal for the future is better interaction with solid
+boundaries and rigid objects. Semi-analytic boundary conditions have been put
+forth which allow for more physically accurate and computationally feasible
+collisions.\cite{Manenti2011} \cite{Harada2007}
+Interaction with rigid bodies has been explored by representing the solid
+objects as a set of particles which are subject to fluid like forces with rigid
+constraints.\cite{Harada2007c} Fluids have also been coupled with cloth simulations with nice results.\cite{Harada2007b}
 
 
 

@@ -60,10 +60,26 @@ year = {2011}
   url = {http://www.khronos.org/registry/cl/}
 }
 @MISC{OpenCLSpec,
-author = {Opencl, Khronos and Group, Working and Munshi, Aaftab},
+author = {Khronos Group}
 title = {{OpenCL Specification}},
 year = {2011}
 }
+
+@MISC{NVBitonic,
+author = {NVIDIA}
+title = {{OpenCL Sorting Networks}},
+year = {2011},
+url = {http://developer.download.nvidia.com/compute/cuda/3_0/sdk/website/OpenCL/website/samples.html#oclSortingNetworks}
+}
+
+@TechReport{ Merrill:Sorting:2010,
+        author = "Duane Merrill and Andrew Grimshaw",
+        title = "Revisiting Sorting for GPGPU Stream Architectures",
+        year = "2010",
+        institution = "University of Virginia, Department of Computer Science",
+        address = "Charlottesville, VA, USA",
+        number = "CS2010-03"
+ }
 
 %OPENGL STUFF
 @MISC{OpenGL,
@@ -82,6 +98,36 @@ year = {2011}
     title = {{A Survey of General-Purpose Computation on Graphics Hardware}},
     volume = {26},
     year = {2007}
+}
+
+@article{VanderLaan2009,
+address = {New York, New York, USA},
+author = {van der Laan, Wladimir J. and Green, Simon and Sainz, Miguel},
+doi = {10.1145/1507149.1507164},
+file = {:Users/enjalot/Documents/Mendeley Desktop/van der Laan, Green, Sainz - 2009 - Screen space fluid rendering with curvature flow.pdf:pdf},
+isbn = {9781605584294},
+journal = {Proceedings of the 2009 symposium on Interactive 3D graphics and games - I3D '09},
+keywords = {although there are extensive,contri-,curvature flow,extract a surface for,fluid,foam,gpu,it is more difficult,noise,real-time,rendering,screen-space,see figure 1,sph,the drawback is that,the grid,to},
+pages = {91},
+publisher = {ACM Press},
+title = {{Screen space fluid rendering with curvature flow}},
+url = {http://portal.acm.org/citation.cfm?doid=1507149.1507164},
+year = {2009}
+}
+
+@article{Fraedrich2010,
+abstract = {High quality volume rendering of SPH data requires a complex order-dependent resampling of particle quantities along the view rays. In this paper we present an efficient approach to perform this task using a novel view-space discretization of the simulation domain. Our method draws upon recent work on GPU-based particle voxelization for the efficient resampling of particles into uniform grids. We propose a new technique that leverages a perspective grid to adaptively discretize the view-volume, giving rise to a continuous level-of-detail sampling structure and reducing memory requirements compared to a uniform grid. In combination with a level-of-detail representation of the particle set, the perspective grid allows effectively reducing the amount of primitives to be processed at run-time. We demonstrate the quality and performance of our method for the rendering of fluid and gas dynamics SPH simulations consisting of many millions of particles.},
+author = {Fraedrich, Roland and Auer, Stefan and Westermann, R\"{u}diger},
+doi = {10.1109/TVCG.2010.148},
+issn = {1077-2626},
+journal = {IEEE transactions on visualization and computer graphics},
+number = {6},
+pages = {1533--40},
+pmid = {20975195},
+title = {{Efficient high-quality volume rendering of SPH data.}},
+url = {http://www.ncbi.nlm.nih.gov/pubmed/20975195},
+volume = {16},
+year = {2010}
 }
 
 
@@ -258,6 +304,50 @@ year = {2007}
     title = {{Smoothed particle hydrodynamics on GPUs}},
     url = {http://individuals.iii.u-tokyo.ac.jp/\~{}yoichiro/report/report-pdf/harada/international/2007cgi.pdf},
     year = {2007}
+}
+
+@article{Harada2007b,
+author = {Harada, Takahiro and Koshizuka, Seiichi and Kawaguchi, Yoichiro},
+journal = {Theory and Practice},
+title = {{Real-time Fluid Simulation Coupled with Cloth}},
+year = {2007}
+}
+@article{Harada2007c,
+author = {Harada, Takahiro and Tanaka, Masayuki and Koshizuka, Seiichi},
+journal = {Simulation},
+keywords = {computer graphics,gpu,particle method,real-time simulation,sph},
+pages = {1--13},
+title = {{Real-time Coupling of Fluids and Rigid Bodies}},
+year = {2007}
+}
+
+@article{Bell2005,
+address = {New York, New York, USA},
+author = {Bell, Nathan and Yu, Yizhou and Mucha, Peter J.},
+doi = {10.1145/1073368.1073379},
+file = {:Users/enjalot/Documents/Mendeley Desktop/Bell, Yu, Mucha - 2005 - Particle-based simulation of granular materials.pdf:pdf},
+isbn = {176952270X},
+journal = {Proceedings of the 2005 ACM SIGGRAPH/Eurographics symposium on Computer animation - SCA '05},
+number = {July},
+pages = {77},
+publisher = {ACM Press},
+title = {{Particle-based simulation of granular materials}},
+url = {http://portal.acm.org/citation.cfm?doid=1073368.1073379},
+year = {2005}
+}
+
+@article{Muller2005,
+address = {New York, New York, USA},
+author = {M\"{u}ller, Matthias and Solenthaler, Barbara and Keiser, Richard and Gross, Markus},
+doi = {10.1145/1073368.1073402},
+file = {:Users/enjalot/Documents/Mendeley Desktop/M\"{u}ller et al. - 2005 - Particle-based fluid-fluid interaction.pdf:pdf},
+isbn = {176952270X},
+journal = {Proceedings of the 2005 ACM SIGGRAPH/Eurographics symposium on Computer animation - SCA '05},
+pages = {237},
+publisher = {ACM Press},
+title = {{Particle-based fluid-fluid interaction}},
+url = {http://portal.acm.org/citation.cfm?doid=1073368.1073402},
+year = {2005}
 }
 
 

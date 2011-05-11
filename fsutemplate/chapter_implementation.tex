@@ -111,20 +111,115 @@ second is the handling of collisions with the domain boundary as well as with
 arbitrary triangular meshes, and the third is advecting the particles by
 integrating their SPH forces over time. 
 
-\subsection{Nearest Neighbor Search}
-* grid/hash technique for nearest neighbor sort
+\section{Nearest Neighbor Search}
+The Nearest Neighbor Search (NNS) is essential to the SPH simulation because it
+allows for the efficient updating of a particle's forces based on surrounding
+particles. The NNS is implemented in two distinct phases, preparation and
+lookup. The preparation phase prepares the data structures needed at the
+beginning of each update, while the lookup phase is performed by any routine
+which needs access to nearest neighbors.
+
+\subsection{Preparation}
+The first step in the NNS preparation is creating an integer hash value for
+each particle to be sorted. This hash value is created by overlaying a uniform
+grid on the domain, calculating the cell which contains the particle and then
+calculating a one dimensional index from the three-dimensional cell index.\cite{Krog2010}
+
+\subsubsection{Hash}
+The cell index is calculated as follows:
+\begin{verbatim}
+int4 cell_index = (pos - grid_min) * grid_delta;
+\end{verbatim}
+
+Where \verb|grid_min| is a \verb|float4| representing the minimum coordinate of
+the grid, obtained from the domain. \verb|grid_delta| is a \verb|float4|
+containing the width of the cell in each dimension. The width of the cells is
+calculated as twice the smoothing length of a particle. In this way a particle
+will only be able to interact with particles in the 26 surrounding cells.
 
 
+The hash is calculated as follows:
+\begin{verbatim}
+int gx = cell_index.x
+int gy = cell_index.y
+int gz = cell_index.z
+hash = (gz*grid_res.y + gy) * grid_res.x + gx;
+\end{verbatim}
 
-\subsubsection{Particle Insertion}
-\toi{does this go here? seems like a good place}
-\subsubsection{Particle Deletion}
+Where \verb|grid_res| is an \verb|int4| containing the number of cells in each dimension.
 
-\subsection{SPH Calculations}
 
-\subsubsection{Density}
+The hash for each particle is stored in an integer array by the \verb|Hash|
+class defined in \verb|rtpslib/system/common/Hash.cpp| with the OpenCL kernel
+implemented in \verb|rtpslib/system/common/cl_src/hash.cl|
 
-\subsubsection{Force}
+\subsubsection{Sort}
+The hash array is then sorted using the Bitonic Sort implementation provided by
+NVIDIA\cite{NVBitonic}. The C interface to the OpenCL code was replaced with a
+C++ interface defined in \verb|rtpslib/system/common/BitonicSort.cpp|. The
+Bitonic Sort implementation can only operate on arrays or subsets of arrays
+with power of two lengths, so the sort always operates on the number of
+particles rounded up to the nearest power of two. The sort is performed on the
+hash values of each particle, with an array of indices being permuted along
+with the hashes.
+
+\subsubsection{Permute}
+Once the hash and indices array are sorted, the arrays for particle position,
+velocity, veleval and color are permuted according to the reordered index
+array. This leaves all the particles and their associated values sorted
+according to their spatial position. The \verb|Permute| class is defined in
+\verb|rtpslib/system/common/Permute.cpp| with the OpenCL Kernel implemented in
+\verb|rtpslib/system/common/cl_src/permute.cl|.
+
+
+\subsubsection{Cell Indices}
+The next step in the preparation is to update two arrays which keep track of
+which cells are populated with particles. These two arrays are
+\verb|cell_indices_start| and \verb|cell_indices_end|, where the former has a
+value of -1 if no particles are present in the cell, or the index into the
+particle array of the first particle in the cell. The latter contains the index
+into the particle array of the last particle contained in a cell.
+The \verb|CellIndices| class is defined in
+\verb|rtpslib/system/common/CellIndices.cpp| with the OpenCL Kernel implemented in
+\verb|rtpslib/system/common/cl_src/cellindices.cl|.
+
+
+\subsection{Lookup}
+A neighbor lookup is performed by calculating the grid cell of a particle and
+iterating over all of the particles in that cell and its 26 neighbors. The grid
+cell and corresponding hash are calculated with the same routines used in the
+preparation. The neighbor search is composed of three functions, the first two
+found in \verb|rtpslib/system/sph/cl_src/cl_neighbors.h| and the last found in
+the \verb|Force| and \verb|Density| kernels.
+
+\subsubsection{IterateParticlesInNearbyCells}
+This function loops over the 26 cells neighboring the cell of the particle
+being queried. For each cell it calls the IterateParticlesInCell function.
+
+\subsubsection{IterateParticlesInCells}
+This function first determines the start index into the particle array from the
+current cell's hash and the \verb|cell_indices_start| array. If the value is
+not $-1$ then the end index is obtained from the \verb|cell_indices_end| array.
+If the hash of the cell is greater than the maximum hash size the routine exits
+early to avoid accessing non-existant array elements. The routine then iterates
+over all of the particles from the start index to the end index and calls the
+ForNeighbor function.
+
+\subsubsection{ForNeighbor}
+This function now has access to the original particle being queried as well as
+the index of a neighboring particle. The code for the previous two routines is
+contained in a header file which is included by the kernel which implements the
+ForNeighbor function. This allows for kernels with different functionality to
+reuse the neighbor search code. Different kernels may require access to
+different arrays 
+
+\section{Particle Insertion and Deletion}
+
+\section{SPH Calculations}
+
+\subsection{Density}
+
+\subsection{Force}
 
 
 \subsection{Collision Detection}
@@ -145,9 +240,17 @@ are not intended to be a general replacement for the official OpenCL interface,
 and focus primarily on the functionality required in this project.
 
 
+\subsection{C++ Wrappers}
+The OpenCL runtime libraries provided by the two largest GPU manufacturers are
+written in C and can be utilized by including the standard C header files
+provided by Khronos.\cite{OpenCL} Khronos also provides a set of C++ headers
+which define convenient C++ classes for interacting with the OpenCL runtime. 
+
 
 \subsection{CLL}
-* class which instanciates opencl
+While the Khronos C++ headers simplify access to the OpenCL runtime API, for
+many common uses further abstraction are convenient. In this project a set of
+utility classes are developed to simplify access to OpenCL resources. 
 
 \subsection{Kernel}
 
@@ -155,8 +258,108 @@ and focus primarily on the functionality required in this project.
 \subsection{Buffer}
 
 
+An example of such a simplifcation can be seen with the code for copying a
+standard vector to the GPU. With the Krhonos C++ API: 
+\begin{cppcode}{0}
+     std::vector<float> a; 
+     ... //initialize a 
+     err = queue.enqueueWriteBuffer(cl_a, CL_TRUE, 0, array_size, &a[0], NULL, 
+         &event);
+\end{cppcode}
+With the utility classes provided by this project:
+\begin{cppcode}{0}
+    std::vector<float> a; 
+     ... //initialize a 
+    cl_a.copyToDevice(a);
+\end{cppcode}
+
+
+\subsection{CL/GL Interoperability}
+A key performance consideration with GPU computing is memory transfer, as
+discussed there is a large difference in speed between $local$ and $global$
+memory, there is an even larger difference in the cost for transfering memory
+between the host (CPU) memory and the device (GPU). Due to this cost it is
+desirable to perform as many operations as possible on the GPU without needing
+to transfer data between the host and the device.
+
+
+As such a key feature in OpenCL programming for games is the ability to share a
+context with OpenGL, allowing OpenCL to directly access and manipulate OpenGL
+memory objects. With this feature one can avoid any transfer of data associated
+with the graphics of the application, therefor if the computation done in
+OpenCL changes the positions of objects to be rendered in OpenGL, it is all
+done in the same memory location.
+
+
 \subsection{Shared memory optimization}
 * shared memory optimization - collisions and hash datastructure 
+* cell indices: allow threads to see previous index hash value without loading from global memory for each thread
+* triangle collisions: load triangles into shared memory and loop over particles
+
+
+\subsection{Issues}
+In the course of developing this project several small issues have been raised
+whos solutions were not trivial. This section describes those issues and the
+design decisions made to address them.
+
+\subsubsection{Kernel Compilation Caching}
+OpenCL is designed to compile kernels at runtime, and once those kernels are
+compiled the binary version is cached for the context in which it is run. This
+cuts down on the cost of running a kernel after the first compilation. An issue
+arises with the Apple implementation of OpenCL when using include directives in
+OpenCL code. If a kernel has been executed and cached by the Apple runtime,
+changes to files included in the kernel will not be reflected in the following
+run, indicating that the cache is not updated. Included files (such as header
+files) are often used for isolating functionality which is common to many
+routines, and it is desirable to develope this functionality in one place and
+have all the code which uses it updated at once. With the caching issue this
+style of development was not possible. The solution put forth in this project
+was to use the g++ preprocessor to preprocess the OpenCL files after making
+changes to the headers. This would generate OpenCL source files which had
+everything in one file so that the kernel which OpenCL was caching was forced
+to update. 
+
+
+\subsubsection{float4}
+The OpenCL 1.0 specification defines the \verb|float4| type as a vector of four
+floating point numbers. Since the simulation in this project is designed to be
+3 dimensional it is the most convenient data type for storing arrays of
+coordinates. The OpenCL 1.1 standard does define a \verb|float3| type, but as
+of this writing the 1.0 standard is still the most widely available
+implementation so we use \verb|float4| for backwards compatibility. It is also
+convenient to package many variables into a single array for use on the GPU,
+and as such one may utilize the unused components of 3 dimensional vectors for
+storing some scalar values.
+
+\subsubsection{GL Context Sharing on the Mac}
+The Apple implementation of OpenCL uses a specific extension for OpenGL context sharing which requires a specific way of creating an OpenCL context. The C++ headers provided by Khronos did not allow for this manner of Context creation, leading to the following modification of $cl.hpp$ provided by Khronos
+\begin{cppcode}{1448}
+Context(cl_context_properties* properties, cl_int* err = NULL)
+    {    
+        cl_int error;
+        object_ = ::clCreateContext(
+            properties, 0, 
+            0,   
+            NULL, NULL, &error);
+
+        detail::errHandler(error, __CREATE_CONTEXT_FROM_TYPE_ERR);
+        if (err != NULL) {
+            *err = error;
+        }    
+
+    }    
+\end{cppcode}
+
+\subsection{Timing}
+
+When developing a performance critical application it is important to know how
+much time subroutines are taking to execute. OpenCL provides a mechanism for
+timing the execution time of a kernel on the GPU, which is essential since
+kernels may be executed asynchronously from the command queue. As part of the
+convenience classes provided by this project for OpenCL, executing a kernel
+automatically times its execution and returns the time in milliseconds.
+
+
 
 
 \subsection{Debugging Routines}
