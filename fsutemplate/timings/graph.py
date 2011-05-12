@@ -39,8 +39,8 @@ for ms in ati_mill_timings["Update loop"]:
 
 
 fps = False
-nv_kernel = False
-nv_ati_neighbors = True
+nv_kernel = True
+nv_ati_neighbors = False
 nv_neighbors = False
 
 
@@ -99,8 +99,8 @@ if nv_kernel:
             'c',
             'y',
             'b',
-            'r',
             'g',
+            'r',
     ]
     markers = [
             'o',
