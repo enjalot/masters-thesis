@@ -117,9 +117,9 @@ calculating a one dimensional index from the three-dimensional cell index.\cite{
 
 \subsubsection{Hash}
 The cell index is calculated as follows:
-\begin{verbatim}
+\begin{cppcode}{0}
 int4 cell_index = (pos - grid_min) * grid_delta;
-\end{verbatim}
+\end{cppcode}
 
 Where \verb|grid_min| is a \verb|float4| representing the minimum coordinate of
 the grid, obtained from the domain. \verb|grid_delta| is a \verb|float4|
@@ -129,12 +129,12 @@ will only be able to interact with particles in the 26 surrounding cells.
 
 
 The hash is calculated as follows:
-\begin{verbatim}
+\begin{cppcode}{0}
 int gx = cell_index.x
 int gy = cell_index.y
 int gz = cell_index.z
 int hash = (gz*grid_res.y + gy) * grid_res.x + gx;
-\end{verbatim}
+\end{cppcode}
 
 Where \verb|grid_res| is an \verb|int4| containing the number of cells in each dimension.
 
@@ -173,6 +173,43 @@ The \verb|CellIndices| class is defined in
 \verb|rtpslib/system/common/CellIndices.cpp| with the OpenCL Kernel implemented in
 \verb|rtpslib/system/common/cl_src/cellindices.cl|.
 
+
+The \verb|cellindices| kernel utilizes local memory to decrease global memory
+accesses in the process of setting the \verb|cell_indices| arrays. 
+The C++ code allocates a local memory array equal to the workgroup size plus 1.
+This array is populated by the current particles hash and then the first thread
+sets the first element of the array to the hash of the previous particle.
+\begin{cppcode}{0}
+uint tid = get_local_id(0);
+sharedHash[tid+1] = hash; 
+
+if (index > 0 && tid == 0)
+{   
+    // first thread in block must load previous particle hash
+    uint hashm1 = sort_hashes[index-1] < ncells ? sort_hashes[index-1] : ncells;
+    sharedHash[0] = hashm1;
+}
+\end{cppcode}
+
+The kernel waits for all threads to finish this computation with a memory fence:
+\begin{cppcode}{0}
+barrier(CLK_LOCAL_MEM_FENCE);
+\end{cppcode}
+
+The accelerated part of the cell index assignment is given here:
+\begin{cppcode}{0}
+if (index > 0)
+{
+    if(sharedHash[tid] != hash)
+    {
+        cell_indices_start[hash] = index;
+        cell_indices_end[sharedHash[tid]] = index;
+    }
+}
+\end{cppcode}
+
+This will update the appropriate start and end indices if the hash between
+neighboring particles is different.
 
 \subsection{Lookup}
 A neighbor lookup is performed by calculating the grid cell of a particle and
@@ -223,7 +260,7 @@ array.
 Particles are inserted by setting the values of the position, velocity and
 color arrays immediately after the $num$ index and incrementing $num$ by the
 number of particles added. When the particles are sorted, the new particle
-positions will be inside the active grid and will be part of the new $num$ of
+positions will be inside the grid and will be part of the new $num$ of
 particles to be used in the simulation.
 
 \subsection{Deletion}
@@ -238,69 +275,240 @@ number of particles which are inside the grid. The number of particles is then
 set to this value and the deleted particles are no longer used in the
 simulation.
 
+\section{Parameters}
+Two structures are defined which hold the all of the parameters for the system,
+one is the \verb|GridParams| structure which holds all the parameters relevant
+to the Domain and spatial grid while the other is \verb|SPHParams| which holds
+all of the parameters relevant to the SPH simulation. These structures are
+populated by the \verb|SPH| and \verb|SPHSettings| classes and passed to all of
+the OpenCL kernels as constant memory structures. The \verb|SPHParams|
+structure is listed in Appendix X\toi{link to SPHParams struct}.
 
-\section{Force Calculations}
+
+\subsection{Calculated Parameters}
+A subset of the physical and simulation parameters are automatically calculated
+based on one user defined parameter, the maximum number of particles. The
+per-particle volume is calculated by dividing a set volume by the maximum
+number of particles. 
+\begin{cppcode}{0}
+float VP = 2 * .0262144 / max_num;              //Particle Volume [ m^3 ]
+\end{cppcode}
+
+The mass of each particle is the product of the rest density and the particle volume.
+\begin{cppcode}{0}
+float mass = 1000. * VP;                         //Particle Mass [ kg ]
+\end{cppcode}
+
+The rest distance between particles is a fraction of the particle radius.
+\begin{cppcode}{0}
+float rest_distance = .87 * pow(VP, 1.f/3.f);   //rest distance between particles [ m ]
+\end{cppcode}
+
+The smoothing distance is simply twice the rest distance.
+\begin{cppcode}{0}
+float smoothing_distance = 2.0f * rest_distance; //interaction radius
+\end{cppcode}
+
+The simulation is scaled to the coordinate space of the user specified Domain
+by relating the volumes of each particle to the volume of the Domain.
+\begin{cppcode}{0}
+float domain_vol = (dmax.x - dmin.x) * (dmax.y - dmin.y) * (dmax.z - dmin.z);
+float simulation_scale = pow(.5f * VP * max_num / domain_vol, 1.f/3.f);
+\end{cppcode}
+
+These calculations are specified in \verb|rtpslib/system/SPHSettings.cpp|.
+
+
+\section{SPH Force Calculations}
 The force calculations defined by the SPH formulation are implemented in three
 distince phases, density, force and collision.
 
 \subsection{Density}
 The density of each particle is calculated by the summation over its neighbors
-as given by the SPH formulation. 
+as given by the SPH formulation. The density calculation only depends on the
+position of the particles and the particle mass. In this implementation the
+particle mass is uniform for all particles and is thus passed in as a constant.
+The density calculation is controlled by the \verb|Density| class defined in
+\verb|rtpslib/system/sph/Density.cpp| and the OpenCL kernel is defined in
+\verb|rtpslib/system/sph/cl_src/density.cl|. The density kernel is included in
+Appendix X.
 
 \subsection{Force}
+The force calculation is controlled by the \verb|Force| class defined in
+\verb|rtpslib/system/sph/Force.cpp| and the OpenCL kernel is defined in
+\verb|rtpslib/system/sph/cl_src/force.cl|. 
 
 
-\subsection{Collision Detection}
+The forces according to the pressure and viscosity terms of the SPH formulation
+are calculated as well as a smoothing factor known as XSPH.\cite{Krog} The XSPH
+calculation is given as follows:
 
+\begin{cppcode}{0}
+    float Wijpol6 = Wpoly6(r, sphp->smoothing_distance, sphp);
+    float4 xsph = 2.f * sphp->mass * Wijpol6 * (velj-veli)/(di+dj);
+    xsph += xsph * (float)iej;
+\end{cppcode}
+
+Where \verb|veli| and \verb|velj| are the velocities at particles i and j
+respectively and \verb|di| and \verb|dj| are the densities at particles i and j
+respectively. The value of iej is given by:
+
+\begin{cppcode}{0}
+int iej = index_i != index_j;
+\end{cppcode}
+
+Which is used to nullify any force or XSPH contributions from a particle with
+itself. Additional care must be taken for particles which obtain the same
+position since the calculation of the $W_{spiky}$ kernel derivative involves
+the division of the distance between particles. A divide-by-zero error is
+avoided by setting the distance used in the kernel to the maximum between the
+distance and a small epsilon, $10^{-6}$.
+
+
+\subsection{Collision}
+The routines which calculate the repulsion force contributions
+from collisions are specified in the
+\verb|rtpslib/system/sph/cl_src/cl_collision.h| header file.
+
+Collisions with the boundary are computed by the kernel in
+\\ \verb|rtpslib/system/sph/cl_src/collision_wall.cl| and controlled by the
+\verb|CollisionWall| class in \verb|rtpslib/system/sph/Collision_wall.cpp|.
+A collision with the boundary is determined by a simple distance query. The
+collision test with the bottom of the domain is given as an example: 
+\begin{cppcode}{0}
+float diff = sphp->boundary_distance - (p.z - gp->bnd_min.z);
+if (diff > sphp->EPSILON)
+{
+    float4 normal = (float4)(0.0f, 0.0f, 1.0f, 0.0f);
+    force += calculateRepulsionForce(normal, v, sphp->boundary_stiffness, 
+            sphp->boundary_dampening, diff);
+}
+\end{cppcode}
+
+Here $p$ is the particle position, $v$ is the particle velocity and
+\verb|gp->bnd_min.z| is the Z coordinate of the bottom of the domain.
+\\
+
+Collisions with triangles are computed by the \verb|collision_triangle| kernel in
+\\ \verb|rtpslib/system/sph/cl_src/collision_tri.cl| and controlled by the
+\verb|CollisionTriangle| class in \verb|rtpslib/system/sph/Collision_triangle.cpp|.
+
+Triangles are defined by their three vertices and a normal in a \verb|Triangle| structure:
+\begin{cppcode}{0}
+typedef struct Triangle
+{
+    float4 verts[3];
+    float4 normal;
+} Triangle;
+\end{cppcode}
+
+The triangles are stored in a vector of \verb|Triangle| structures in C++ and
+passed to OpenCL as an array. The \verb|collision_triangle| kernel is executed
+with one thread per-particle. The first thread in each workgroup copies a section of the
+triangle array into local memory. After synchronizing the threads with a local
+barrier, each thread iterates over the list of triangles and determines
+particle-triangle collisions with a ray-triangle intersection
+test.\cite{Ericson} If a collision is detected the force on a particle is
+modified according to the repulsion force formula. Once all of the triangles in
+the section have been iterated over, the next section of triangles is copied to
+local memory and iterated over. This process is repeated until all of the
+triangles have been checked for collisions.
 
 
 \section{Integration}
+
+Integration of the forces and velocities of the particles are computed by the
+\verb|leapfrog| kernel in \verb|rtpslib/system/sph/cl_src/leapfrog.cl| and
+controlled by the \verb|LeapFrog| class in
+\verb|rtplslib/system/sph/LeapFrog.cpp|.
+
+In the following code snippets, the following variables will be referred to:
+$p$ is the position of a particle, $v$ is the velocity and $f$ is the force.
+
+
+Gravity is first added to the Z component of force of each particle. The
+magnitude of the force is scaled to a maximum speed given by a the \verb|velocity_limit| parameter:
+\begin{cppcode}{0}
+float speed = length(f);
+if (speed > sphp->velocity_limit) 
+{
+    f *= sphp->velocity_limit/speed;
+}
+\end{cppcode}
+
+The force is then integrated to update the velocity. The velocity is
+effectively smoothed by the XSPH calculated in the \verb|force| kernel adjusted
+by a user defined parameter. The position is then updated by integrating the
+velocity.
+\begin{cppcode}{0}
+float4 vnext = v + dt*f;
+vnext += sphp->xsph_factor * xsph_s[i];
+p += dt * vnext;
+\end{cppcode}
+
+The LeapFrog integration is calculated and stored for use in the force and XSPH
+calculations in the \verb|force| kernel.
+\begin{cppcode}{0}
+float4 veval = 0.5f*(v+vnext);
+\end{cppcode}
+
 
 
 
 \section{OpenCL}
 
 The framework provides several classes to abstract access to OpenCL routines.
-The underlying OpenCL functionality is provided by the Khronos C++ header files
-as discussed in Chapter 3 (GPU Computing).\toi{need to be able to link to a chapter}
-The purpose of these classes is convenience for the developer, hiding tedious
+The underlying OpenCL functionality is provided by the Khronos C++ header
+files.\cite{OpenCL} 
+
+The purpose of RTPS OpenCL classes is convenience for the developer, hiding tedious
 and repetitive behavior and providing sensible default behavior. The classes
 are not intended to be a general replacement for the official OpenCL interface,
 and focus primarily on the functionality required in this project.
 
-
-\subsection{C++ Wrappers}
-The OpenCL runtime libraries provided by the two largest GPU manufacturers are
-written in C and can be utilized by including the standard C header files
-provided by Khronos.\cite{OpenCL} Khronos also provides a set of C++ headers
-which define convenient C++ classes for interacting with the OpenCL runtime. 
-
-
 \subsection{CLL}
-While the Khronos C++ headers simplify access to the OpenCL runtime API, for
-many common uses further abstraction are convenient. In this project a set of
-utility classes are developed to simplify access to OpenCL resources. 
+The fundamental OpenCL class provided by the library is the \verb|CLL| class
+defined in \verb|rtpslib/opencl/CLL.cpp|. When this class is instanciated it
+creates and stores the OpenCL context and command queue to be used by the
+\verb|RTPS| and \verb|System| classes. The class also provides routines for
+building programs and loading kernels.
 
 \subsection{Kernel}
+The \verb|Kernel| class abstracts the creation and use of OpenCL kernels.
+Instanciating a \verb|Kernel| class will load a kernel from source using the
+context from the provided \verb|CLL| instance. The primary purpose of this
+class is to abstract kernel execution, simplifying the process of setting
+kernel arguements, automating the timing of kernel executions and hiding the
+command queue syntax.
+
+
+The \verb|Kernel| class is defined in \verb|rtpslib/opencl/Kernel.cpp|.
 
 
 \subsection{Buffer}
 
+The \verb|Buffer| class abstracts the creation and use of OpenCL buffers.
+Buffers can be created from OpenGL vertex buffer objects or STL vectors.
+Convenience methods are provided for copying data to and from the GPU.
 
-An example of such a simplifcation can be seen with the code for copying a
-standard vector to the GPU. With the Krhonos C++ API: 
+The extent of the simplification can be seen by comparing the code for copying a
+standard vector to the GPU with the Krhonos C++ API
 \begin{cppcode}{0}
      std::vector<float> a; 
      ... //initialize a 
      err = queue.enqueueWriteBuffer(cl_a, CL_TRUE, 0, array_size, &a[0], NULL, 
          &event);
 \end{cppcode}
-With the utility classes provided by this project:
+
+with the utility classes provided by this project
 \begin{cppcode}{0}
     std::vector<float> a; 
      ... //initialize a 
     cl_a.copyToDevice(a);
 \end{cppcode}
+
+
+The \verb|Buffer| class is defined in \verb|rtpslib/opencl/Buffer.cpp|.
 
 
 \subsection{CL/GL Interoperability}
@@ -319,11 +527,6 @@ with the graphics of the application, therefor if the computation done in
 OpenCL changes the positions of objects to be rendered in OpenGL, it is all
 done in the same memory location.
 
-
-\subsection{Shared memory optimization}
-* shared memory optimization - collisions and hash datastructure 
-* cell indices: allow threads to see previous index hash value without loading from global memory for each thread
-* triangle collisions: load triangles into shared memory and loop over particles
 
 
 \subsection{Issues}
@@ -361,7 +564,10 @@ and as such one may utilize the unused components of 3 dimensional vectors for
 storing some scalar values.
 
 \subsubsection{GL Context Sharing on the Mac}
-The Apple implementation of OpenCL uses a specific extension for OpenGL context sharing which requires a specific way of creating an OpenCL context. The C++ headers provided by Khronos did not allow for this manner of Context creation, leading to the following modification of $cl.hpp$ provided by Khronos
+The Apple implementation of OpenCL uses a specific extension for OpenGL context
+sharing which requires a specific way of creating an OpenCL context. The C++
+headers provided by Khronos did not allow for this manner of Context creation,
+leading to the following modification of $cl.hpp$ provided by Khronos
 \begin{cppcode}{1448}
 Context(cl_context_properties* properties, cl_int* err = NULL)
     {    

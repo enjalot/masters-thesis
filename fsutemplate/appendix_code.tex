@@ -1,8 +1,259 @@
 
 \section{Download}
-\toi{github links}
+The code for the entire modified Blender project is available for download at the following url \\
+\url{https://github.com/enjalot/BGERTPS} \\
+If git\cite{Git} is installed, the following command will
+download the code: 
+\begin{verbatim}
+git clone git://github.com/enjalot/BGERTPS.git
+cd BGERTPS
+git submodule init
+git submodule update
+\end{verbatim} 
 
-\section{RTPSettings.h}
+The code for just the RTPS library is available for download at the following url \\ 
+\url{https://github.com/enjalot/EnjaParticles} \\
+If git\cite{Git} is installed, the following command will
+download the code: 
+\begin{verbatim}
+git clone git://github.com/enjalot/EnjaParticles.git
+\end{verbatim} 
+
+Build instructions for each platform are provided in the README and INSTALL
+files in the root directory of both source trees.
+
+
+\section{SPHParams}
+The structure used to pass physical and simulation parameters to OpenCL.
 \begin{cppcode}{0}
+
+#ifdef WIN32
+#pragma pack(push,16)
+#endif
+typedef struct SPHParams
+    {
+        float mass;
+        float rest_distance;
+        float smoothing_distance;
+        float simulation_scale;
+
+        //dynamic params
+        float boundary_stiffness;
+        float boundary_dampening;
+        float boundary_distance;
+        float K;        //gas constant
+
+        float viscosity;
+        float velocity_limit;
+        float xsph_factor;
+        float gravity; // -9.8 m/sec^2
+
+        float friction_coef;
+        //next 4 not used at the moment
+        float restitution_coef;
+        float shear;
+        float attraction;
+
+        float spring;
+        //float surface_threshold;
+        //constants
+        float EPSILON;
+        float PI;       //delicious
+        //Kernel Coefficients
+        float wpoly6_coef;
+
+        float wpoly6_d_coef;
+        float wpoly6_dd_coef; // laplacian
+        float wspiky_coef;
+        float wspiky_d_coef;
+
+        float wspiky_dd_coef;
+        float wvisc_coef;
+        float wvisc_d_coef;
+        float wvisc_dd_coef;
+
+
+        //CL parameters
+        int num;
+        int nb_vars; // for combined variables (vars_sorted, etc.)
+        int choice; // which kind of calculation to invoke
+        int max_num;
+
+ } SPHParams
+#ifndef WIN32
+    __attribute__((aligned(16)));
+#else
+        ;
+        #pragma pack(pop)
+#endif
+
+\end{cppcode}
+
+\section{CellIndices Kernel}
+The OpenCL Kernel for computing the start and end indices pointing into the
+particle array for each grid cell.
+
+\begin{cppcode}{0}
+#include "cl_macros.h"
+#include "cl_structs.h"
+        
+__kernel void cellindices(
+                            int num,
+                            __global uint* sort_hashes,
+                            __global uint* sort_indices,
+                            __global uint* cell_indices_start,
+                            __global uint* cell_indices_end,
+                            //__constant struct SPHParams* sphp,
+                            __constant struct GridParams* gp,
+                            __local  uint* sharedHash   // blockSize+1 elements
+                            )
+{
+    uint index = get_global_id(0);
+    uint ncells = gp->nb_cells;
+
+    uint hash = sort_hashes[index];
+    //don't want to write to cell_indices arrays if hash is out of bounds
+    if( hash > ncells)
+    {   
+        return;
+    }   
+    // Load hash data into shared memory so that we can look 
+    // at neighboring particle's hash value without loading
+    // two hash values per thread   
+    uint tid = get_local_id(0);
+    sharedHash[tid+1] = hash;  // SOMETHING WRONG WITH hash on Fermi
+
+    if (index > 0 && tid == 0)
+    {
+        // first thread in block must load neighbor particle hash
+        uint hashm1 = sort_hashes[index-1] < ncells ? sort_hashes[index-1] : ncells;
+        sharedHash[0] = hashm1;
+    }
+
+#ifndef __DEVICE_EMULATION__
+    barrier(CLK_LOCAL_MEM_FENCE);
+#endif
+
+    // If this particle has a different cell index to the previous
+    // particle then it must be the first particle in the cell,
+    // so store the index of this particle in the cell.
+    // As it isn't the first particle, it must also be the cell end of
+    // the previous particle's cell
+
+    //Having this check here is important! Can't quit before local threads are done
+    //but we can't keep going if our index goes out of bounds of the number of particles
+    if (index >= num) return;
+
+    if (index == 0)
+    {
+        cell_indices_start[hash] = index;
+    }
+
+    if (index > 0)
+    {
+        if(sharedHash[tid] != hash)
+        {
+            cell_indices_start[hash] = index;
+            cell_indices_end[sharedHash[tid]] = index;
+        }
+    }
+    //return;
+
+    if (index == num - 1)
+    {
+        cell_indices_end[hash] = index + 1;
+    }
+}
+
+\end{cppcode}
+
+\section{Density Kernel}
+The OpenCL Kernel for computing the density of each particle.
+
+\begin{cppcode}{0}
+//These are passed along through cl_neighbors.h
+//only used inside ForNeighbor defined in this file
+#define ARGS __global float4* pos, __global float* density
+#define ARGV pos, density
+        
+#include "cl_macros.h"
+#include "cl_structs.h"
+//Contains all of the Smoothing Kernels for SPH
+#include "cl_kernels.h"
+        
+inline void ForNeighbor(//__global float4*  vars_sorted,
+                        ARGS,
+                        PointData* pt,
+                        uint index_i,
+                        uint index_j,
+                        float4 position_i,
+                        __constant struct GridParams* gp,
+                        __constant struct SPHParams* sphp
+                        DEBUG_ARGS
+                       )
+{
+    int num = sphp->num;
+    float4 position_j = pos[index_j] * sphp->simulation_scale; 
+    float4 r = (position_i - position_j);
+    r.w = 0.f; // I stored density in 4th component
+    // |r|
+    float rlen = length(r);
+
+    // is this particle within cutoff?
+    if (rlen <= sphp->smoothing_distance)
+    {
+        // return density.x for single neighbor
+        float Wij = Wpoly6(r, sphp->smoothing_distance, sphp);
+
+        pt->density.x += sphp->mass*Wij;
+    }
+}
+//Contains Iterate...Cells methods and ZeroPoint
+#include "cl_neighbors.h"
+
+//--------------------------------------------------------------
+// compute forces on particles
+
+__kernel void density_update(
+//                       __global float4* vars_sorted,
+                       ARGS,
+                       __global int*    cell_indexes_start,
+                       __global int*    cell_indexes_end,
+                       __constant struct GridParams* gp,
+                       __constant struct SPHParams* sphp
+                       DEBUG_ARGS
+                       )
+{
+    // particle index
+    int nb_vars = sphp->nb_vars;
+    int num = sphp->num;
+    //int numParticles = get_global_size(0);
+    //int num = get_global_size(0);
+
+    int index = get_global_id(0);
+    if (index >= num) return;
+
+    float4 position_i = pos[index] * sphp->simulation_scale;
+
+    //debuging
+    clf[index] = (float4)(99,0,0,0);
+    //cli[index].w = 0;
+
+    // Do calculations on particles in neighboring cells
+    PointData pt;
+    zeroPoint(&pt);
+
+    //IterateParticlesInNearbyCells(vars_sorted, &pt, num, index, position_i, cell_indexes_start, cell_indexes_end, gp,/* fp,*/ sphp DEBUG_ARGV);
+    IterateParticlesInNearbyCells(ARGV, &pt, num, index, position_i, cell_indexes_start, cell_indexes_end, gp,/* fp,*/ sphp DEBUG_ARGV);
+    density[index] = sphp->wpoly6_coef * pt.density.x;
+    /*
+    clf[index].x = pt.density.x * sphp->wpoly6_coef;
+    clf[index].y = pt.density.y;
+    clf[index].z = sphp->smoothing_distance;
+    clf[index].w = sphp->mass;
+    */
+    clf[index].w = density[index];
+}
+
 \end{cppcode}
 
