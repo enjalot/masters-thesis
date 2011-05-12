@@ -53,8 +53,17 @@ convenient when developing for a user interface such as in Blender where the
 configuration of settings is not known until runtime.  
 An example of specifying the available settings for SPH can be found in
 \verb|rtpslib/system/SPHSettings.h|.
-\toi{put a couple examples of getting and setting some settings here}
 
+
+An example of setting an option with an RTPSettings instance:
+\begin{cppcode}{0}
+settings->SetSetting("sub_intervals", 1);
+\end{cppcode}
+
+An example of getting an option with an RTPSettings instance:
+\begin{cppcode}{0}
+int sub_intervals =  settings->GetSettingAs<float>("sub_intervals");
+\end{cppcode}
 
 \subsection{System}
 
