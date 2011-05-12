@@ -15,7 +15,7 @@ scene as a set of discrete, two-dimensional pixels. While there are various
 techniques for rasterization, an underlying theme is the necessity for a large
 amount of independent calculations being done for each pixel. These operations
 include many linear algebra and other floating point math operations useful for
-two and three-dimensional geometry and effects.
+two and three-dimensional geometry and effects.\cite{Luebke2007}
 
 
 As graphics hardware became more sophisticated, more control of this parallel
@@ -26,34 +26,84 @@ through the standard interface. Shaders were named for their primary use of
 shading and lighting objects, which often times calls for the computation of
 sophisticated mathematical and physical models. OpenGL provides a programming
 language called GLSL for writing shaders, which allows the programer to
-manipulate vertices, colors, textures, and recently geometry all in parallel.
+manipulate vertices, colors, textures, and recently geometry all in parallel.\cite{Luebke2007}
 
 
 \section{General Purpose GPU Programming}
 
-use this citation (survey): \cite{Owens2007}
 
 With the advances in graphics hardware, most notably with the introduction of
 shaders, the GPU began to share similarities with the vector processing
-architectures used in super computers for scientific simulations. Researchers
+architectures used in supercomputers for scientific simulations. Researchers
 began using GPUs to compute problems suitable for a parallel vector processor
 at a fraction of the cost of a super computer. The speed benefits of using a
 GPU over a CPU for highly parallel problems at a low cost has generated
-increasing interest in using the GPU for general purpose computing.
-\toi{cite the cvt article evan talks about as well as a particle system on gpu article} 
+increasing interest in using the GPU for general purpose computing.\cite{Owens2007}
 
-\subsection{Architecture}
+
+\section{GPU Programming Languages}
+
+Programming languages available for programming GPUs have evolved over the last
+decade from specialized graphics languages into general purpose programming
+languages such as CUDA and OpenCL.\cite{Owens2007}
+
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=1.0]{figures/frogs.jpg}
+        \caption{ GPU Programming Language Evolution \cite{Bollig} }
+        \label{fig:frogs}
+\end{figure}
+
+
+
+\subsection{CUDA}
+In 2006 graphics card manufacturer NVIDIA created the CUDA architecture 
+for general purpose computing on NVIDIA GPUs. CUDA is programmed with the 'C
+for CUDA' language, which abstracts access to the GPU resources. CUDA provides
+familiar programming techniques such as template programming and memory access
+and manipulation with pointers. CUDA is leading the GPGPU market in performance
+and features, however due to its proprietary nature and lack of availability on
+competing platforms such as AMD or Intel it was not considered as an option for
+this project.
+
+
+\subsection{OpenCL}
+
+In 2009 OpenCL was released as an open standard for a parallel computing
+language and runtime API by Khronos, an industry run consortium which also
+controls the OpenGL standard.\cite{OpenCL} The OpenCL specification provides
+for two things, the OpenCL runtime and the OpenCL programming language. The
+OpenCL runtime is designed for parallel programming in heterogeneous
+environments, providing mechanisms for dealing with multiple and varied compute
+devices such as CPUs and the many types and generations of GPUs.  The OpenCL
+programming language is a derivative of C99, giving it familiar syntax in an
+otherwise unfamiliar context for many programmers.
+
+
+OpenCL is more recent and less mature of a language than CUDA, additionally it
+is designed by a consortium rather than a single company so innovation is
+adopted rather than pushed. OpenCL still lacks several features such as
+templates and memory addressing which make programming easier. The fact that it
+is an open standard supported by the largest entities in the computing industry
+are the motivation behind choosing a less featureful environment for this
+project. It is expected that OpenCL will continue to improve for some time and
+is a relatively safe bet for institutions with long-term plans.
+
+
+
+\section{Architecture}
 The idea behind the architecture of a Graphics Processing Unit is to have many
 smaller floating point processors operate on a large amount of data in
 parallel.
 The way this is achieved in general is by implementing a memory heirarchy which
-allows each processor to quickly operate on data which it needs. An abstraction for such a memory model is given in figure X:
+allows each processor to quickly operate on data which it needs. The OpenCL 
+memory model is given in Figure \ref{fig:gpu_memory}
 
 \begin{figure}[!htc]
  		\centering
 		\includegraphics[scale=1.0]{figures/gpu_memory.pdf}
-		\label{fig:logic}
-        \caption{ OpenCL Memory Heirarchy Diagram \cite{OpenCLSpec} }
+        \caption{ OpenCL Memory Hierarchy Diagram \cite{OpenCLSpec} }
+        \label{fig:gpu_memory}
 \end{figure}
 
 The figure shows four main types of memory: $global$, $constant$, $local$ and
@@ -64,35 +114,28 @@ usually cached for fast access. $Local$ memory is specific to each compute
 unit, while much faster than $global$ memory it cannot be used to communicate
 between compute units. Compute units are further divided into workers, which
 can be thought of as individual threads which each have their own $private$
-memory. Threads are executed in batches called workgroups, and each thread in a
-workgroup has access to the same bank of $local$ memory, as well as access to
+memory. Threads are executed in batches called work-groups, and each thread in a
+work-group has access to the same bank of $local$ memory, as well as access to
 all of the $global$ memory. 
 
 
-Since $local$ memory access is normally at least an
-order of magnitude faster than $global$ memory access, GPU computing requires
-great attention to the memory usage patterns of an algorithm. The most ideal
-algorithms for general purpose GPU computing are Single Instruction, Multiple
-Data (SIMD) algorithms in which the same operations are carried out on
-completely independent data. For these algorithms each worker can operate on
-the data assigned to it without concern for the behavior, status or output of
-other workers. There exist many algorithms which are not completely SIMD but
-can take advantage of the parallel nature of GPU programming by utilizing the
-memory heirarchy in efficient ways.
+Threads, or work items, in a work-group are executed simultaneously and in
+parallel, unless the kernel being executed contains $branching$ code such as if
+statements. In the event of branching threads for each branch will execute
+synchronously, limiting the effectiveness of the GPU. Since $local$ memory
+access is normally at least an order of magnitude faster than $global$ memory
+access, $local$ memory is often used as a user controlled cache. A common
+technique is to copy frequently used $global$ memory to $local$ memory with one
+thread, synchronizing the threads with a barrier and then processing the
+$local$ memory in parallel. 
 
 
-\section{OpenCL}
+$Local$ and $global$ memory are consistant at a work-group barrier, meaning all
+threads will see the same value in memory after a barrier is placed. $Global$
+memory is not guaranteed to be consistent across work-groups so it is important
+to avoid memory conflicts within a single kernel launch.
 
-OpenCL is a recent open standard for a parallel computing language and runtime
-API put forward by the Khronos, an industry run consortium which also controls
-the OpenGL standard.\cite{OpenCL} The OpenCL specification provides for two things, the
-OpenCL runtime and the OpenCL programming language. The OpenCL runtime is
-designed for parallel programming in heterogeneous environments, providing
-mechanisms for dealing with multiple and varied compute devices such as CPUs
-and the many types and generations of GPUs.  The OpenCL programming language is
-a derivative of C99, giving it familiar syntax in an otherwise unfamiliar
-context for many programmers.
-
+\subsection{OpenCL Runtime}
 
 In order to execute programs written in OpenCL a programmer must first use the
 OpenCL runtime API to setup a $context$. An OpenCL context provides the
@@ -106,20 +149,6 @@ while buffers are the memory which the kernels can take as arguments (i.e.
 arrays). Kernels are compiled at runtime by OpenCL, allowing the same code to
 be run on different device architectures without any guidance from the
 programmer.
-
-
-\subsection{CUDA}
-Several years before the advent of OpenCL, graphics card manufacturer NVIDIA created the CUDA
-language and runtime for general purpose computing on NVIDIA GPUs. CUDA is much
-more specialized towards GPU computing than OpenCL, and also more mature as a
-programming language. CUDA provides such programming language features as
-Templates as well as an integrated programming environment for writing GPU code
-inside of an otherwise CPU based program. The performance of CUDA on NVIDIA
-cards is generally considered to be better than OpenCL, however it cannot be
-run on other platforms such as those made by AMD or Intel. Due to CUDA's
-proprietary nature and lack of availability on a sizeable section of the
-computing population it was not considered as an option for this project.
-
 
 
 
