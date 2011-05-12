@@ -39,11 +39,15 @@ for ms in ati_mill_timings["Update loop"]:
 
 
 fps = False
-nv_kernel = False 
-nv_ati_neighbors = False 
-nv_neighbors = True
+nv_kernel = False
+nv_ati_neighbors = True
+nv_neighbors = False
+
+
+num_ticks = [16384, 32768, 65536, 131072, 262144]
 
 if fps:
+    fps_ticks = [30, 60, 100, 200, 400, 1000]
     krog_fps = [1424, 1084, 837, 429, 245, 140, 74]
     pylab.figure(0)
     pylab.plot(nv_nums, krog_fps, 'o-', label='SimpleSim on GTX480 max_num = num')
@@ -55,6 +59,8 @@ if fps:
     pylab.legend(loc='upper right')
     pylab.xlabel('Number of Particles')
     pylab.ylabel('Frames Per Second')
+    pylab.xticks(num_ticks, num_ticks)
+    pylab.yticks(fps_ticks, fps_ticks)
 
 
     pylab.figure(1)
@@ -67,6 +73,8 @@ if fps:
     pylab.legend(loc='upper right')
     pylab.xlabel('Number of Particles')
     pylab.ylabel('Frames Per Second')
+    pylab.xticks(num_ticks, num_ticks)
+    pylab.yticks(fps_ticks, fps_ticks)
 
 
 if nv_kernel:
@@ -76,22 +84,60 @@ if nv_kernel:
         'Hash GPU kernel execution',
         'CellIndices GPU kernel execution',
         'Permute GPU kernel execution',
-        'Bitonic Sort function',
-        'Density GPU kernel execution',
-        'Force GPU kernel execution',
         'Collision Wall GPU kernel execution',
         'Collision triangles function',
         'LeapFrog Integration GPU kernel execution',
+        'Bitonic Sort function',
+        'Density GPU kernel execution',
+        'Force GPU kernel execution',
+    ]
+    colors = [
+            '.25',
+            '.5',
+            '.75',
+            'm',
+            'c',
+            'y',
+            'b',
+            'r',
+            'g',
+    ]
+    markers = [
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            'o',
+            '^',
+            'D',
+            'H',
     ]
 
 
-    for key in keys:
-        pylab.plot(nv_nums, nv_timings[key], 'o-', label=key)
+    bot = nv_timings[keys[0]]
+    width = 10000
+    for i,key in enumerate(keys):
+        """
+        if i == 0:
+            pylab.bar(nv_nums[2:], nv_timings[key][2:], width, color=colors[i], label=key)
+        else:
+            pylab.bar(nv_nums[2:], nv_timings[key][2:], width, bottom=bot[2:], color=colors[i], label=key)
+            #each bar needs to start at the cumulative bottom of the last
+            for j,x in enumerate(bot):
+                bot[j] += nv_timings[key][j]
+                
+        """
+        pylab.plot(nv_nums, nv_timings[key], 'o-', linewidth=2.0, color=colors[i], marker=markers[i], label=key)
 
 
     pylab.legend(loc='upper left')
     pylab.xlabel('Number of Particles')
     pylab.ylabel('Milliseconds')
+    import numpy
+    pylab.xticks(num_ticks, num_ticks)
+    #num_ticks = numpy.array(num_ticks)
+    #pylab.xticks(num_ticks + width / 2., num_ticks)
 
 if nv_neighbors:
     pylab.figure(3)
@@ -114,7 +160,6 @@ if nv_neighbors:
 
 
 if nv_ati_neighbors:
-    pylab.figure(4)
 
     keys = [
         'Bitonic Sort function',
@@ -122,10 +167,26 @@ if nv_ati_neighbors:
         'Force GPU kernel execution',
     ]
 
-
+    nv_pie = []
+    ati_pie = []
     for key in keys:
-        pylab.plot(nv_nums, nv_timings[key], 'o-', label='NVIDIA ' + key)
-        pylab.plot(nv_nums, ati_timings[key], 's--', label='AMD' + key)
+        nv_pie += [ nv_timings[key][-1] ]
+        ati_pie += [ ati_timings[key][-1] ]
+
+
+
+    
+    pylab.figure(4)
+    pylab.pie(nv_pie, labels=keys)
+    pylab.figure(5)
+    pylab.pie(ati_pie, labels=keys)
+        #pylab.pie(ati_timings, labels='AMD')
+        
+    #for key in keys:
+        #pylab.plot(nv_nums, nv_timings[key], 'o-', label='NVIDIA ' + key)
+        #pylab.plot(nv_nums, ati_timings[key], 's--', label='AMD' + key)
+
+
 
 
     pylab.legend(loc='upper left')
