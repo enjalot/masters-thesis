@@ -709,8 +709,6 @@ from \verb|Render| and overrides the $render$ function. The class is
 implemented in \verb|rtpslib/render/SpriteRender.cpp| and the shaders are in
 \verb|rtpslib/render/shaders|.
 
-\toi{Add in a blurb about Andrew's Surface Rendering? how to cite him?}
-
 
 \section{Blender Source Modification}
 
@@ -739,6 +737,14 @@ Blender's internal architecture is available at
 
 \subsection{User Interface}
 %screenshot
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.6]{figures/ui_mod.png}
+        \caption{ RTPS Modifier UI panel }
+		\label{fig:ui_emitter}
+\end{figure}
+
+
 For this project the \verb|RTPS Modifier| was created.\cite{enjaCustomModifier} The
 data stored in the modifier are the configurations and run-time options for the
 RTPS library.  These options are exposed to the game designer in a panel and
@@ -795,6 +801,15 @@ provide interactive emissions of particles by using the Logic Bricks to change
 the $num$ property during game play.
 %screenshot
 
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.22]{figures/ui_emitter.png}
+        \caption{ Logic panel showing Blob emitter }
+		\label{fig:ui_emitter}
+\end{figure}
+
+
+
 The Hose emitter will spray a stream of particles in the direction and speed of
 a user specified velocity vector. The radius of the nozzle is specified as a
 multiple of the particle spacing. The Hose has a set number of particles it
@@ -814,6 +829,13 @@ particles available to the hose, the $speed$ property gives the initial
 velocity of the particles emitted from the hose while the $radius$ determines
 how wide the Hose is. The direction of the Hose is determined by the
 orientation of the Y axis of the Hose Object.
+
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.6]{figures/ui_hose.png}
+        \caption{ Logic panel showing Hose emitter }
+		\label{fig:ui_emitter}
+\end{figure}
 
 \subsection{Orientation}
 In Blender Objects are positioned in a Global coordinate system, with data

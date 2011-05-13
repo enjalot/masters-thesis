@@ -25,7 +25,7 @@ Currently there exist many free and non-free tools for creating video games,
 including game engines, various two and three dimensional content creation
 suites as well as audio and video editing programs. Professional game design
 studios generally have teams of experts for each of these pieces of software
-working together. An educator may not have these resources at her disposal and
+working together. An educator may not have these resources at their disposal and
 thus it is desirable to seek a solution where most of the functionality can be
 found in one program, thereby reducing the costs of learning and integrating
 various components. Due to the relatively limited resources most educators have
@@ -71,16 +71,6 @@ Engine, many in depth tutorials and step-by-step tutorials are available for
 free on the internet.
 
 
-\begin{comment}
-\begin{figure}[!htc]
- 		\centering
-%maybe this figure doesn't have to be centered?
-		\includegraphics[scale=0.5]{figures/blender_ui.png}
-		\label{fig:logic}
-        \caption{ Blender Game Engine Interface }
-\end{figure}
-\end{comment}
-
 \subsection{Logic Editor}
 
 The Logic Editor interface gives access to Game Properties and Logic bricks for
@@ -88,6 +78,14 @@ each Object in the Scene.  Logic bricks are the entry point for controlling
 Objects in the Blender Game Engine, while Game Properties allow Objects to have
 variables associated with them. Logic Bricks are divided into three classes:
 Sensors, Controllers and Actuators.
+
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.35]{figures/ui_logic.png}
+        \caption{ Blender Game Engine Logic Bricks }
+		\label{fig:logic}
+\end{figure}
+
 
 Sensors are how the Game Engine receives inputs, from the user as well as from
 other objects or events. For example, to receive input from the keyboard one
@@ -124,7 +122,12 @@ incorporate functionality from outside libraries.
 \subsection{Physics}
 Rigid body physical simulation is provided by the Bullet Physics library
 \footnote{\url{http://bulletphysics.org}}. Rigid body physics allow for many interesting
-effects and convincing interactions.
+effects and convincing interactions. 
+
+The Blender software suite provides two fluid simulators, one developed as an
+extension to Blender's particle system adn the other as an internal library.
+Unfortunately neither of these fluid simulators is available in the game engine
+since they are unable to perform at interactive speeds.
 
 
 
