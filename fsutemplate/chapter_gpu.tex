@@ -25,7 +25,7 @@ hardware to do more sophisticated computational operations than available
 through the standard interface. Shaders were named for their primary use of
 shading and lighting objects, which often times calls for the computation of
 sophisticated mathematical and physical models. OpenGL provides a programming
-language called GLSL for writing shaders, which allows the programer to
+language called GLSL for writing shaders, which allows the programmer to
 manipulate vertices, colors, textures, and recently geometry all in parallel.\cite{Luebke2007}
 
 
@@ -49,7 +49,8 @@ languages such as CUDA and OpenCL.\cite{Owens2007}
 
 \begin{figure}[!htc]
  		\centering
-		\includegraphics[scale=.6]{figures/frogs.jpg}
+		\includegraphics[scale=.55]{figures/GPU_Evolution_opencl.pdf}
+		%\includegraphics[scale=.6]{figures/frogs.jpg}
         \caption{ GPU Programming Language Evolution \cite{Bollig} }
         \label{fig:frogs}
 \end{figure}
@@ -95,7 +96,7 @@ is a relatively safe bet for institutions with long-term plans.
 The idea behind the architecture of a Graphics Processing Unit is to have many
 smaller floating point processors operate on a large amount of data in
 parallel.
-The way this is achieved in general is by implementing a memory heirarchy which
+The way this is achieved in general is by implementing a memory hierarchy which
 allows each processor to quickly operate on data which it needs. The OpenCL 
 memory model is given in Figure \ref{fig:gpu_memory}
 
@@ -108,7 +109,7 @@ memory model is given in Figure \ref{fig:gpu_memory}
 
 The figure shows four main types of memory: $global$, $constant$, $local$ and
 $private$. $Global$ memory is memory available to all of the processors (known
-as compute units) and is the slowest type of memory in the heirarchy.
+as compute units) and is the slowest type of memory in the hierarchy.
 $Constant$ memory is memory which is read-only by the compute units, and is
 usually cached for fast access. $Local$ memory is specific to each compute
 unit, while much faster than $global$ memory it cannot be used to communicate
@@ -130,7 +131,7 @@ thread, synchronizing the threads with a barrier and then processing the
 $local$ memory in parallel. 
 
 
-$Local$ and $global$ memory are consistant at a work-group barrier, meaning all
+$Local$ and $global$ memory are consistent at a work-group barrier, meaning all
 threads will see the same value in memory after a barrier is placed. $Global$
 memory is not guaranteed to be consistent across work-groups so it is important
 to avoid memory conflicts within a single kernel launch.

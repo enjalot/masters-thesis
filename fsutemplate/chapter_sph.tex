@@ -72,11 +72,10 @@ Where $\mu$ represents the dynamic viscosity and $f$ represents external forces 
 
 \section{Smoothed Particle Hydrodynamics}
 
-\toi{cite monoghan review \cite{Monoghan2005}
-cite liu and liu review \cite{Liu2010}}
 
 The key idea behind Smoothed Particle Hydrodynamics lies in the integral
-approximation of a field function. The integral representation of a field
+approximation of a field function. \cite{Monaghan2005}
+The integral representation of a field
 function, $A$ is given by: 
 $$
 A(r) = \int_\Omega A(r')W(r-r', h)dr'
@@ -170,7 +169,7 @@ on the accuracy and consistency of the method. Kernel functions and their
 derivatives must have compact support, having a value of 0 outside of the
 smoothing radius. The behavior of the kernel functions and their derivatives
 can also strongly impact the behavior of the particles, so care is taken when
-selecting a kernel.
+selecting a kernel.\cite{Liu2010}
 
 The following kernels were selected for their performance in \cite{Krog2010}.
 \\
@@ -222,6 +221,13 @@ $$
     0 & \text{$otherwise$}
 \end{cases}
 $$
+
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.6]{figures/poly6kernel.png}
+        \caption{ $W_{poly6}$ kernel in 1 dimension }
+		\label{fig:poly6kernel}
+\end{figure}
 
 
 \subsection{Collisions}

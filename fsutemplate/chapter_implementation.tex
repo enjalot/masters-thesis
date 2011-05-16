@@ -690,12 +690,28 @@ option and specifying the position and color VBOs with $glVertexPointer$ and
 $glColorPointer$ respectively. The Point rendering functionality is implemented
 in \verb|rtpslib/render/Render.cpp|
 
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.2]{figures/standalone.png}
+        \caption{ Fluid rendered as Points in standalone application }
+		\label{fig:points}
+\end{figure}
+
+
+
 \subsection{Point Sprites}
 A common way to render particles is with a technique known as $billboarding$.
 In this technique a small texture is rendered to a quad which is always aligned
 to be perpendicular with the camera. With this technique it is possible to
 improve upon the point rendering as well as fake some volumetric effects with
 low computation cost.
+
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.2]{figures/pointsprites.png}
+        \caption{ Fluid rendered as PointSprites in Blender }
+		\label{fig:pointsprites}
+\end{figure}
 
 
 The \verb|SpriteRender| class implements billboarding using the
@@ -741,7 +757,7 @@ Blender's internal architecture is available at
  		\centering
 		\includegraphics[scale=0.6]{figures/ui_mod.png}
         \caption{ RTPS Modifier UI panel }
-		\label{fig:ui_emitter}
+		\label{fig:ui_mod}
 \end{figure}
 
 
@@ -782,6 +798,13 @@ by checking for a specific game property. If the boolean value of the
 $collider$ property is true the faces of the object will be collected in a
 vector and passed to the RTPS instance as Triangle objects. This does assume
 that the mesh of the object is composed purely of Triangles. 
+\begin{figure}[!htc]
+ 		\centering
+		\includegraphics[scale=0.6]{figures/collision_ui.png}
+        \caption{ Collision Object }
+		\label{fig:collision_ui}
+\end{figure}
+
 
 \subsubsection{Emission}
 Objects which emit particles are also handled in the Update routine. The
@@ -834,8 +857,9 @@ orientation of the Y axis of the Hose Object.
  		\centering
 		\includegraphics[scale=0.6]{figures/ui_hose.png}
         \caption{ Logic panel showing Hose emitter }
-		\label{fig:ui_emitter}
+		\label{fig:ui_hose}
 \end{figure}
+\clearpage
 
 \subsection{Orientation}
 In Blender Objects are positioned in a Global coordinate system, with data
