@@ -38,9 +38,9 @@ for ms in ati_mill_timings["Update loop"]:
     ati_mill_rtps_fps += [ms2fps(ms)]
 
 
-fps = False
-nv_kernel = True
-nv_ati_neighbors = False
+fps = False 
+nv_kernel = False 
+nv_ati_neighbors = True 
 nv_neighbors = False
 
 
@@ -50,12 +50,15 @@ if fps:
     fps_ticks = [30, 60, 100, 200, 400, 1000]
     krog_fps = [1424, 1084, 837, 429, 245, 140, 74]
     pylab.figure(0)
-    pylab.plot(nv_nums, krog_fps, 'o-', label='SimpleSim on GTX480 max_num = num')
-    pylab.plot(nv_nums, nv_rtps_fps, 'o-', label='RTPS on GTX480 max_num = num')
-    pylab.plot(nv_nums, ati_rtps_fps, 'o-', label='RTPS on FireProV7800 max_num = num')
+    pylab.plot(nv_nums, krog_fps, 'o-', linewidth=2, markersize=10, label='SimpleSim on GTX480 max_num = num')
+    pylab.plot(nv_nums, nv_rtps_fps, 'o-', linewidth=2, markersize=10, label='RTPS on GTX480 max_num = num')
+    pylab.plot(nv_nums, ati_rtps_fps, 'o-', linewidth=2, markersize=10, label='RTPS on FireProV7800 max_num = num')
 
     pylab.axhline(30, linestyle='--', alpha=.5, label='30fps')
     pylab.axhline(60, linestyle='-.', alpha=.5, label='60fps')
+
+    
+
     pylab.legend(loc='upper right')
     pylab.xlabel('Number of Particles')
     pylab.ylabel('Frames Per Second')
@@ -64,9 +67,9 @@ if fps:
 
 
     pylab.figure(1)
-    pylab.plot(nv_nums, krog_fps, 'o-', label='SimpleSim on GTX480 max_num = num')
-    pylab.plot(nv_nums, nv_mill_rtps_fps, 'o-', label='RTPS on GTX480 max_num = 1million')
-    pylab.plot(nv_nums, ati_mill_rtps_fps, 'o-', label='RTPS on FireProV7800 max_num = 1million')
+    pylab.plot(nv_nums, krog_fps, 'o-', linewidth=4, markersize=10, label='SimpleSim on GTX480 max_num = num')
+    pylab.plot(nv_nums, nv_mill_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = 1million')
+    pylab.plot(nv_nums, ati_mill_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = 1million')
 
     pylab.axhline(30, linestyle='--', alpha=.5, label='30fps')
     pylab.axhline(60, linestyle='-.', alpha=.5, label='60fps')
@@ -128,7 +131,7 @@ if nv_kernel:
                 bot[j] += nv_timings[key][j]
                 
         """
-        pylab.plot(nv_nums, nv_timings[key], 'o-', linewidth=2.0, color=colors[i], marker=markers[i], label=key)
+        pylab.plot(nv_nums, nv_timings[key], 'o-', linewidth=4.0, markersize=10, color=colors[i], marker=markers[i], label=key)
 
 
     pylab.legend(loc='upper left')
@@ -189,9 +192,9 @@ if nv_ati_neighbors:
 
 
 
-    pylab.legend(loc='upper left')
-    pylab.xlabel('Number of Particles')
-    pylab.ylabel('Milliseconds')
+    #pylab.legend(loc='upper left')
+    #pylab.xlabel('Number of Particles')
+    #pylab.ylabel('Milliseconds')
 
 
 
