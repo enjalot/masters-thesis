@@ -1,12 +1,12 @@
 \chapter{Particle Systems}
 
 \section{Particle Systems}
-\toi{discuss the fundamental aspects of particle systems}
 A Particle system is a system composed of points in space whose behavior is
 defined by rules which act on those points. Most commonly used in graphics and
 video games to simulate special effects like fire, smoke, water and explosions
 particle systems are also used in computational fluid dynamics, astrophysics
-and materials science. 
+and materials science.
+
 \begin{comment}
 \begin{figure}[!htc]
  		%\centering
@@ -20,24 +20,25 @@ and materials science.
 
 
 All particle systems share some fundamental properties, first they must be able
-to represent points in 1, 2 or 3 dimensional space. For our purpose we will use
-3 dimensions, with the location of each particle being denoted with the
-coordinates \verb|x|, \verb|y| and \verb|z|. We conceptualize each particle as
-an unique individual in the system, usually representing some small piece of a
-larger whole. In our case each particle represents some small volume of water,
-but for a fire effect the particle serves as an animated paint brush. In both
-cases each particle will have some associated properties unique to it, such as
-its density in the water simulation, or its color in the fire effect.
+to represent points in 1, 2 or 3 dimensional space. For the purpose of this
+research  3 dimensions will be used, with the location of each particle being
+denoted with the coordinates \verb|x|, \verb|y| and \verb|z|. Each particle is
+conceptualized as an unique individual in the system, usually representing some
+small piece of a larger whole. In the fluid simulation of this research each
+particle represents some small volume of water, but for a fire effect the
+particle serves as an animated paint brush. In both cases each particle will
+have some associated properties unique to it, such as its density in the water
+simulation, or its color in the fire effect.
 
 
 A particle system is not useful unless it changes over time, therefore it is
-important to have the concept of a \verb|timestep|. The timestep is used to
+important to have the concept of a \verb|time-step|. The time-step is used to
 determine how fast a system changes over time. It is important to distinguish
 between simulation time and real-time, one can simulate the formation of a
-galaxy over a million years, or the creation of a protien in nanoseconds and
+galaxy over a million years, or the creation of a protein in nanoseconds and
 render each as a 30 second movie. We will discuss simulation time in terms of
 \verb|updates| to the system, where each update advances the simulation time
-one timestep. The creator of the system can determine how many updates to
+one time-step. The creator of the system can determine how many updates to
 perform for some unit of real-time. This is usually measured in frames per
 second, where a frame is the rendering of a 3D scene to be displayed. A
 desirable frames per second (fps) for a video game is 60fps, with 30fps
@@ -52,26 +53,19 @@ the particles exert force on each other. When we update the system, we want to
 calculate a new location for each particle based on the forces applied to it.
 This is done by integrating the force to obtain a velocity and then integrating
 the velocity to obtain the new position.
-\toi{acceleration, velocity and position equations (Euler)} 
-The simplest way of computing this is called Euler's method, which takes the
-velocity at the previous timestep, and adds the force multiplied by the
-timestep. The new velocity is then multiplied by the timestep and added to the
-position at the previous timestep to obtain the new position.
-
-\begin{comment}
-\begin{figure}[!htc]
- 		\centering
-		\includegraphics[scale=0.5]{figures/eulers_method.png}
-		\label{fig:logic}
-        \caption{ A Particle moving according to forces }
-\end{figure}
-show a particle's path over time with dotted previous particles. have a reference curve which is the velocity function
-we should end up with a streamline where the viewer can see the state at each previous timestep
-\end{comment}
 
 
-Particle systems are especially interesting because simple rules governing the behavior of
-each particle can lead to complex behavior of the whole system. 
+Particle systems are especially interesting because simple rules governing the
+behavior of each particle can lead to complex behavior of the whole system.
+Particle systems have been classified into various classes based on how the
+particles interact. Non-interacting particle systems are simply systems where
+all of the forces are determined by the individual particle and no others are
+considered, commonly used to simulate fireworks. Long range interacting
+particle systems are systems where most of the particles interact with every
+other particle, such as in gravitational N-body systems. Short range
+interacting particle systems are systems such as the fluid simulator proposed
+in this research, where each particle interacts with neighbors in a small
+region around it. \cite{Knowles2009} 
 
 
 
@@ -80,8 +74,8 @@ each particle can lead to complex behavior of the whole system.
 
 There are many aspects to particle systems which will be common to different
 simulations, namely the locations of each particle in some space as well as the
-notion of displaying them in some way. In order to create an extensible tool we
-designed an object oriented software framework for general particle systems.
+notion of displaying them in some way. In order to create an extensible tool 
+this project designed an object oriented software framework for general particle systems.
 The primary motivation for this is to avoid duplicating work when creating
 different simulations.
 

@@ -23,7 +23,7 @@ space.
 
 In general, an Eulerian method will discretize an area of space with a grid,
 where each grid cell will represent a small volume through which a fluid can
-pass. The accuracy of Eulerian methods is largely dependant on the resolution
+pass. The accuracy of Eulerian methods is largely dependent on the resolution
 of this grid, by using more and smaller cells one will generally end up with a
 more accurate result. This presents a problem when one considers that the grid
 must be stored in the limited memory of a computer, so there is a cost to
@@ -35,7 +35,7 @@ where more resolution is necessary to accurately resolve the behavior, one
 would like to dynamically provide higher resolution in the area of the
 deformation while leaving the rest of the grid intact.
 While many Eulerian methods address these concern with adaptive mesh techniques,
-the computational costs involved are not ammenable to real-time simulations. 
+the computational costs involved are not amenable to real-time simulations. 
 
 
 Lagrangian methods have a natural way to remove dependence on a spatial grid,
@@ -46,7 +46,7 @@ volume of fluid and stores material properties. Particles then interact with
 each other over time, transfer material properties and are moved in space
 according to forces determined by the method. Since the location of the
 particles is not fixed, and the fluid is represented only by the particles, the
-problem of limited storage is seperated from the problem of resolution. With
+problem of limited storage is separated from the problem of resolution. With
 particle based methods resolution is increased by adding more particles, but
 without the spatial restriction.
 
@@ -251,11 +251,11 @@ normal along the axis pointing inside the domain.
 \subsubsection{Triangles}
 
 Collisions with arbitrary triangles are calculated are performed by using an
-algorithm for interescting a line segment with a triangle from \cite{Ericson}. The line segment is
+algorithm for intersecting a line segment with a triangle from \cite{Ericson}. The line segment is
 created by adding the velocity scaled by a distance parameter to the particle
 position. The technique uses barycentric coordinates to test if the point where
 the segment intersects with the plane of the triangle is within the triangle.
-The implemented routine is given in Apendix X.
+The implemented routine is given in Appendix X.
 
 %\cite{Ericson} %Real-Time collision detection pp 191
 
@@ -288,5 +288,5 @@ $$
 $$
 v_{i+1} = v_i + \frac{(a_i + a_i+1)}{2} dt
 $$
-where $i$ denotes the current timestep, $x$ is the position vector, $v$ is the velocity vector and $a$ is the acceleration vector.
+where $i$ denotes the current time-step, $x$ is the position vector, $v$ is the velocity vector and $a$ is the acceleration vector.
 

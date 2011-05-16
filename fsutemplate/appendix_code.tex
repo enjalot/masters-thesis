@@ -1,5 +1,6 @@
 
 \section{Download}
+\label{appendix:download}
 The code for the entire modified Blender project is available for download at the following url \\
 \url{https://github.com/enjalot/BGERTPS} \\
 If git\cite{Git} is installed, the following command will
@@ -24,6 +25,7 @@ files in the root directory of both source trees.
 
 
 \section{SPHParams}
+\label{appendix:sphparams}
 The structure used to pass physical and simulation parameters to OpenCL.
 \begin{cppcode}{0}
 
@@ -90,6 +92,7 @@ typedef struct SPHParams
 \end{cppcode}
 
 \section{Cell Indices Kernel}
+\label{appendix:cellindices}
 The OpenCL Kernel for computing the start and end indices pointing into the
 particle array for each grid cell.
 
@@ -168,6 +171,7 @@ __kernel void cellindices(
 \end{cppcode}
 
 \section{Density Kernel}
+\label{appendix:density}
 The OpenCL Kernel for computing the density of each particle.
 
 \begin{cppcode}{0}

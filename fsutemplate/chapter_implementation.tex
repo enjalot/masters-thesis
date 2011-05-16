@@ -4,8 +4,9 @@
 
 In this section we discuss the various classes which make up the Real-Time
 Particle System framework. Filenames will be denoted as such \verb|rtpslib/RTPS.h|
-and refer to the directory structure of the code. \toi{link to code here? or
-reference?}
+and refer to the directory structure of the code \ref{appendix:code}.
+
+
 
 \subsection{RTPS}
 
@@ -250,7 +251,7 @@ reuse the neighbor search code. Different kernels may require access to
 different arrays within the ForNeighbor routine, in order to pass different
 arguments through all three routines \verb|#define| macros are used to specify
 the arguements of each function and the values passed through. An example of
-this is provided in Appendix X \toi{link to appendix with density kernel}.
+this is provided in Appendix \ref{appendix:density}.
 
 \section{Particle Insertion and Deletion}
 Particles can be dynamically inserted into and deleted from the simulation by
@@ -291,7 +292,7 @@ to the Domain and spatial grid while the other is \verb|SPHParams| which holds
 all of the parameters relevant to the SPH simulation. These structures are
 populated by the \verb|SPH| and \verb|SPHSettings| classes and passed to all of
 the OpenCL kernels as constant memory structures. The \verb|SPHParams|
-structure is listed in Appendix X\toi{link to SPHParams struct}.
+structure is listed in Appendix \ref{appendix:sphparams}.
 
 
 \subsection{Calculated Parameters}
@@ -887,5 +888,6 @@ present the normal rendering is bypassed and the $render$ routine of the RTPS
 instance is called instead.
 
 \subsection{Files}
-For a complete list of Blender source files modified by the project please refer to Appendix X\toi{link to an appendiex with MODIFIED FILES}
+For a complete list of Blender source files modified by the project please
+refer to Appendix \ref{appendix:modified} 
 
