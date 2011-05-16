@@ -66,11 +66,39 @@
 \begin{abstract}
 \begin{figure}[!htc]
  		\centering
-		\includegraphics[scale=0.25]{figures/dsc_fsuseal.png}
+		\includegraphics[scale=0.15]{figures/dsc_fsuseal.png}
 		\label{fig:dsc_fsuseal}
 \end{figure}
 
-The goal of this project is blah blah blah.
+Advances in computational power have lead to many developments in science and
+entertainment. Powerful simulations which required expensive supercomputers can
+now be carried out on a consumer personal computer and many children and young
+adults spend countless hours playing sophisticated computer games. The focus of
+this research is the development of tools which can help bring the entertaining
+and appealing traits of video games to scientific education.
+
+One of the main factors contributing to the rise in computational power and the
+increasing sophistication of video games is the Graphics Processing Unit (GPU).
+As a piece of consumer hardware a GPU is relatively low cost and available to
+almost anyone with a computer. The market for GPUs has been primarily driven by
+video gamers wanting to improve the experience of their games through better
+and often more realistic graphics. 
+
+Video game developers use many tools and programming languages to build their
+games, among these tools is the Blender 3D content creation suite. Blender
+includes a Game Engine which can be used to design and develop sophisticated
+interactive experiences. One important tool in computer graphics and animation
+is the particle system, particle systems can be used to simulate effects such
+as fire and smoke as well as provide realistic simulations of fluids like water
+or oil. The particle system available in Blender is unfortunately not available
+in the Blender Game Engine because it is not fast enough to run in real-time.
+
+This thesis presents a particle system library accelerated by the GPU using the
+OpenCL programming language. The primary system implemented in this research is
+a fluid simulator using the Smoothed Particle Hydrodynamics technique for
+simulating incompressible fluids. The library is integrated into the Blender
+Game Engine providing an interactive platform for exploring fluid dynamics and
+creating video games with realistic water effects.
 
 
 \end{abstract}
@@ -111,7 +139,20 @@ The goal of this project is blah blah blah.
 \bibliography{mythesis}
 
 \begin{biosketch}
-    Ian 'enjalot' Johnson was born on the 6th of October, 1985 in Leiden, Netherlands. Ian grew up Ithica, New York and Tallahassee, Florida.
+    Ian 'enjalot' Johnson was born on the 6th of October, 1985 in Leiden,
+    Netherlands. Ian grew up in Tallahassee, Florida where he became interested
+    in computers at a young age. One chapter of his youth involved lucrative
+    yet misguided efforts in hacking video games. Upon reaching some semblance
+    of maturity Ian has channeled his creative energies into constructive
+    projects and now enjoys building tools that help people create video games.
+
+    Ian's research interests include computer graphics, scientific
+    visualization, and interactive education. When not studying, he enjoys
+    spending time with his loved ones, teaching those around him and traveling
+    and eating local foods.
+
+    Ian currently lives in Tallahassee, Florida but can be found from anywhere
+    in the world by visiting his web-site \url{http://enja.org}.
 \end{biosketch}
 
 \end{document}
