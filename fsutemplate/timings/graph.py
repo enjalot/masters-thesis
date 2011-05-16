@@ -38,9 +38,9 @@ for ms in ati_mill_timings["Update loop"]:
     ati_mill_rtps_fps += [ms2fps(ms)]
 
 
-fps = False 
+fps = True 
 nv_kernel = False 
-nv_ati_neighbors = True 
+nv_ati_neighbors = False 
 nv_neighbors = False
 
 
@@ -50,9 +50,9 @@ if fps:
     fps_ticks = [30, 60, 100, 200, 400, 1000]
     krog_fps = [1424, 1084, 837, 429, 245, 140, 74]
     pylab.figure(0)
-    pylab.plot(nv_nums, krog_fps, 'o-', linewidth=2, markersize=10, label='SimpleSim on GTX480 max_num = num')
-    pylab.plot(nv_nums, nv_rtps_fps, 'o-', linewidth=2, markersize=10, label='RTPS on GTX480 max_num = num')
-    pylab.plot(nv_nums, ati_rtps_fps, 'o-', linewidth=2, markersize=10, label='RTPS on FireProV7800 max_num = num')
+    pylab.plot(nv_nums, krog_fps, 'o-', linewidth=4, markersize=10, label='SimpleSim on GTX480 max_num = num')
+    pylab.plot(nv_nums, nv_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = num')
+    pylab.plot(nv_nums, ati_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = num')
 
     pylab.axhline(30, linestyle='--', alpha=.5, label='30fps')
     pylab.axhline(60, linestyle='-.', alpha=.5, label='60fps')

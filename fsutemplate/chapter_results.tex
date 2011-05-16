@@ -32,21 +32,22 @@ timings, when using fps a higher number is desirable while when measuring in
 milliseconds a lower number is preferred.
 
 \pagebreak
+\clearpage
 
 \begin{figure}[!htc]
  		\centering
-        \subfloat[maximum number of particles equal to number of particles]{\label{fig:fps_num}\includegraphics[scale=0.4]{figures/maxnum_eq_num_fps.png}}
-        \\
-        \subfloat[maximum number of particles equal to 1 million]{\label{fig:fps_1mill}\includegraphics[scale=0.4]{figures/maxnum_eq_1mill_fps.png}}
-        \caption{Frame Rates}
-        \label{fig:fps}
+        \includegraphics[scale=0.45]{figures/maxnum_eq_num_fps.png}
+        \caption{ {\footnotesize Performance of RTPS compared with SimpleSim. Here the maximum
+        particle setting for RTPS is the same as the number of particles used
+        for timing}}
+        \label{fig:fps_num}
 \end{figure}
 
-\pagebreak
 
 For the timings in \ref{fig:fps_num} the only parameter varied is the maximum number of particles.
 For each case the maximum number of particles is emitted and the timing of each
 function call is averaged over 1000 iterations.
+
 
 One logical use scenario would involve setting a large maximum number of
 particles and only using a relatively small subset of them. This will make the
@@ -55,6 +56,17 @@ user to get a more detailed simulation. It turns out that this use case is much
 more efficient than setting the maximum number of particles to the amount to be
 used as can be seen in Figure \ref{fig:fps_1mill}.
 
+
+\begin{figure}[!htc]
+ 		\centering
+        \includegraphics[scale=0.45]{figures/maxnum_eq_1mill_fps.png}
+        \caption{ {\small Performance of RTPS with the maximum number of particles
+        setting equal to 1 million. The timings for RTPS are collected using
+        the given number of particles.}}
+        \label{fig:fps_1mill}
+\end{figure}
+
+\pagebreak
 One can see from Figure \ref{fig:kernel_time} that the Density and Force calculations are by far
 the most expensive routines. These routines have the most memory accesses, and
 the more neighbors that each particle must calculate the more memory accesses
@@ -89,6 +101,9 @@ for each card, with the sort contributing more on the AMD hardware.
         \caption{ Proportion of GPU timings for the most expensive kernels on each card }
         \label{fig:pies}
 \end{figure}
+
+\pagebreak
+\clearpage
 
 \section{Data Structures}
 The data structures used on the GPU are given as follows:
@@ -143,7 +158,7 @@ provided valuable feedback, crash reports and even demos.\footnote{ \url{http://
 
 \begin{figure}[!htc]
  		\centering
-		\includegraphics[scale=0.5]{figures/youtube.png}
+		\includegraphics[scale=0.75]{figures/youtube.png}
         \caption{ Artist demo }
 		\label{fig:mpan}
 \end{figure}
@@ -154,43 +169,82 @@ integration becomes tighter it is expected that more developers will be willing
 and able to help.
 
 \pagebreak
-\clearpage
+%\clearpage
 
-\section{Screen Shots}
+\section{Illustrative Examples}
 
-Selected screen shots of the Blender Game Engine with the RTPS library in action.
+The following figures demonstrate various possible simulations using the RTPS
+framework inside the Blender Game Engine. Figure \ref{fig:dam_break} shows a
+simple dam break simulation with collision against boxes inside the domain.
+Here relatively few particles are used and the simulation runs at 60fps.
 
+%\begin{figure}[H]
 \begin{figure}[!htc]
  		%\centering
-		\includegraphics[scale=0.17]{figures/dam_break.png}
-        \caption{ Dam break with 65k particles maximum }
+		\includegraphics[scale=0.4]{figures/dam_break.png}
+        \caption{ A Dam break simulation. The maximum number of particles is set to 65k.
+        Physical parameters are set as follows: Gravity = -9.8, Gas
+        Constant = 1.0, Viscosity = .001, Velocity Limit = 600, XSPH = .2}
 		\label{fig:dam_break}
 \end{figure}
 
 \pagebreak
+\clearpage
+
+Figures \ref{fig:flood1} and \ref{fig:flood2} show a water flooding simulation where
+over 100k particles are emitted through several hoses and then collide against
+cubes placed in the domain. The maximum number of particles was set to
+1,000,000 for a higher resolution simulation at the cost of real-time. This
+simulation averaged 10fps.
+
 
 \begin{figure}[!htc]
  		%\centering
-		\includegraphics[scale=0.17]{figures/flood1.png}
-        \caption{ 100k particles colliding with boxes. }
+		\includegraphics[scale=0.4]{figures/flood1.png}
+        \caption{ Flooding simulation, 100k particles emitted from hoses and
+        colliding with boxes. The maximum number of particles is set to
+        1,000,000. Physical parameters are set as follows: Gravity = -9.8, Gas
+        Constant = 1.0, Viscosity = .001, Velocity Limit = 600, XSPH = .05}
 		\label{fig:flood1}
 \end{figure}
 
 \pagebreak
+\clearpage
+
 \begin{figure}[!htc]
  		%\centering
-		\includegraphics[scale=0.17]{figures/flood2.png}
-        \caption{ 100k particles colliding with boxes. }
+		\includegraphics[scale=0.4]{figures/flood2.png}
+        \caption{ Later timestep in same flooding simulation as Figure \ref{fig:flood1} }
 		\label{fig:flood2}
 \end{figure}
 
 \pagebreak
 \clearpage
 
+Figure \ref{fig:viscous} shows a viscous fluid being emitted from a hose. A
+high viscosity gives a more honey-like appearance and reduces waves and
+splashes in the fluid.
+
+\begin{figure}[!htc]
+ 		%\centering
+		\includegraphics[scale=0.4]{figures/viscous.png}
+        \caption{ Demonstrating the Hose emitter with high viscosity. The maximum number of particles is set to 100k.
+        Physical parameters are set as follows: Gravity = -9.8, Gas
+        Constant = 1.0, Viscosity = 1.0, Velocity Limit = 600, XSPH = .2}
+		\label{fig:viscous}
+\end{figure}
+
+\pagebreak
+\clearpage
+
+
+
 \subsection{Videos}
 
 Videos have been recorded throughout the process of this research and are
-available on the web. These videos are listed in reverse chronological order
+available on the web. The videos serve as progress reports of the project
+throughout its development, each one highlighting new features or explaining
+design decisions made. These videos are listed in reverse chronological order
 from most recent to oldest. \\
 \url{http://vimeo.com/21743717} \\
 \url{http://vimeo.com/19794084} \\
