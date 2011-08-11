@@ -22,12 +22,12 @@ not yet as efficient as SimpleSPH. Comparisons with CPU implementations were
 not carried out as the literature has shown the wide gap in performance makes
 the CPU non-competitive.\cite{Hoetzlein}\cite{Krog2010}
 
-Frames per Second (fps) is an important metric for most videogame players.  A
+Frames per Second (fps) is an important metric for most video game players.  A
 reasonable number for an interactive 3D game is 60fps, although 30fps is
 sometimes deemed acceptable. Note that movies play at 24fps. The performance of
 the simulations are compared with frames per second, while analysis of the
 routines within the simulation is measured in milliseconds. Updating one frame
-takes 17ms to obtain a framerate of 60fps, and 33ms at 30fps. In the following
+takes 17ms to obtain a frame rate of 60fps, and 33ms at 30fps. In the following
 timings, when using fps a higher number is desirable while when measuring in
 milliseconds a lower number is preferred.
 
@@ -84,7 +84,7 @@ contributes a non-trivial amount of time to the computation.
 
 Figure \ref{fig:kernel_time} shows a linear increase in cost as the number of
 particles increase past 16384. Below this number increasing the particles has a
-negligable effect on the cost. This is most likely due to the overhead of
+negligible effect on the cost. This is most likely due to the overhead of
 launching the kernels overshadowing the small amount of memory accesses and
 computations required by such a small amount of particles. 
 
@@ -163,7 +163,7 @@ provided valuable feedback, crash reports and even demos.\footnote{ \url{http://
 		\label{fig:mpan}
 \end{figure}
 
-The project has also recieved support from developers with regards to
+The project has also received support from developers with regards to
 integrating the RTPS library with Blender. As the code improves and the
 integration becomes tighter it is expected that more developers will be willing
 and able to help.

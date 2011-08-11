@@ -16,11 +16,11 @@ implementation of the Radix sort in CUDA\cite{Merrill:Sorting:2010} which can be
 
 
 Collision detection is currently implemented in a brute force manner. Data
-structures must be invesitigated which can handle particle collisions with
-objects at various scales. One such data structure is Heirarchical Spatial
+structures must be investigated which can handle particle collisions with
+objects at various scales. One such data structure is Hierarchical Spatial
 Subdivision, an extension of the current grid-based method for particle
 interaction.\cite{Pouchol2009} Triangle based collisions are desirable for
-their ability to handle general objects but are not neccessary for all use
+their ability to handle general objects but are not necessary for all use
 cases. Implementing various collision primitives such as spheres, cylinders and
 axis aligned bounding boxes will allow for interesting interactions in game
 play at a lower performance cost. 
@@ -34,7 +34,7 @@ suitable speeds.
 Two approaches are being considered, first a screen-space technique which uses
 curvature flow to give the impression of a fluid surface.\cite{VanderLaan2009}
 Another approach is to extract the surface particles using data from the
-simulation and performing GPU raycasting on the much smaller subset of
+simulation and performing GPU ray casting on the much smaller subset of
 points.\cite{Goswami2010} Volume rendering techniques for the GPU have received
 increasing interest and may present an opportunity for real-time
 rendering.\cite{Fraedrich2010}
@@ -56,7 +56,7 @@ particle system. Along these lines, another goal is to integrate with the
 existing particle system as much as possible, both in user interface as well as
 functionality.
 Further improvements to the user interface will include a special modifier for
-emitting particles from objects, eliminating the error prone and tedius method
+emitting particles from objects, eliminating the error prone and tedious method
 of adding custom game properties. 
 
 
