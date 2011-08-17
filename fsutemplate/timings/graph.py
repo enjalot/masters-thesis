@@ -2,6 +2,25 @@
 import pickle
 import pylab
 
+from pylab import arange,pi,sin,cos,sqrt
+fig_width_pt = 1200 # Get this from LaTeX using \showthe\columnwidth
+inches_per_pt = 1.0/72.27               # Convert pt to inch
+golden_mean = (sqrt(5)-1.0)/2.0         # Aesthetic ratio
+fig_width = fig_width_pt*inches_per_pt  # width in inches
+fig_height = fig_width*golden_mean      # height in inches
+fig_size =  [fig_width,fig_height]
+params = {'backend': 'WXAgg',
+          'axes.labelsize': 20,
+          'text.fontsize': 20,
+          'legend.fontsize': 20,
+          'xtick.labelsize': 20,
+          'ytick.labelsize': 20,
+          #'text.usetex': True,
+          'figure.figsize': fig_size}
+pylab.rcParams.update(params)
+
+
+
 def ms2fps(ms):
     return 1000./ms
 
@@ -38,21 +57,22 @@ for ms in ati_mill_timings["Update loop"]:
     ati_mill_rtps_fps += [ms2fps(ms)]
 
 
-fps = True 
-nv_kernel = False 
-nv_ati_neighbors = False 
-nv_neighbors = False
+fps = False#True 
+nv_kernel = False#True 
+nv_ati_neighbors = True 
+nv_neighbors = False 
 
 
-num_ticks = [16384, 32768, 65536, 131072, 262144]
+#num_ticks = [16384, 32768, 65536, 131072, 262144]
+num_ticks = [32768, 65536, 131072, 262144]
 
 if fps:
     fps_ticks = [30, 60, 100, 200, 400, 1000]
     krog_fps = [1424, 1084, 837, 429, 245, 140, 74]
-    pylab.figure(0)
-    pylab.plot(nv_nums, krog_fps, 'o-', linewidth=4, markersize=10, label='SimpleSim on GTX480 max_num = num')
-    pylab.plot(nv_nums, nv_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = num')
-    pylab.plot(nv_nums, ati_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = num')
+    fig = pylab.figure(0)
+    pylab.plot(nv_nums[2:], krog_fps[2:], 'H-', linewidth=4, markersize=10, label='SimpleSPH on GTX480 max_num = num')
+    pylab.plot(nv_nums[2:], nv_rtps_fps[2:], '^-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = num')
+    pylab.plot(nv_nums[2:], ati_rtps_fps[2:], 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = num')
 
     pylab.axhline(30, linestyle='--', alpha=.5, label='30fps')
     pylab.axhline(60, linestyle='-.', alpha=.5, label='60fps')
@@ -65,11 +85,13 @@ if fps:
     pylab.xticks(num_ticks, num_ticks)
     pylab.yticks(fps_ticks, fps_ticks)
 
+    #fig
+
 
     pylab.figure(1)
-    pylab.plot(nv_nums, krog_fps, 'o-', linewidth=4, markersize=10, label='SimpleSim on GTX480 max_num = num')
-    pylab.plot(nv_nums, nv_mill_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = 1million')
-    pylab.plot(nv_nums, ati_mill_rtps_fps, 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = 1million')
+    pylab.plot(nv_nums[2:], krog_fps[2:], 'H-', linewidth=4, markersize=10, label='SimpleSPH on GTX480 max_num = num')
+    pylab.plot(nv_nums[2:], nv_mill_rtps_fps[2:], '^-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = 1million')
+    pylab.plot(nv_nums[2:], ati_mill_rtps_fps[2:], 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = 1million')
 
     pylab.axhline(30, linestyle='--', alpha=.5, label='30fps')
     pylab.axhline(60, linestyle='-.', alpha=.5, label='60fps')
@@ -179,12 +201,33 @@ if nv_ati_neighbors:
 
 
     
-    pylab.figure(4)
-    pylab.pie(nv_pie, labels=keys)
-    pylab.figure(5)
-    pylab.pie(ati_pie, labels=keys)
-        #pylab.pie(ati_timings, labels='AMD')
+    fig = pylab.figure(4)#, figsize=(8,12))
+    #ax = pylab.axes([0.1, 0.1, 0.8, 0.8])
+    bigAxes = pylab.axes(frameon=False)     # hide frame
+    pylab.xticks([])                        # don't want to see any ticks on this axis
+    pylab.yticks([])
+    pylab.subplots_adjust(bottom=.1, left=.4, right=.6, top=.94, hspace=.5)
+
+    nvp = fig.add_subplot(2,1,1)
+    atip = fig.add_subplot(2, 1, 2)#, sharex=nvp, sharey=nvp)
+
+    #pylab.pie(nv_pie, labels=keys, autopct='%1.1f%%', shadow=False)
+    #pylab.pie(nv_pie, labels=keys, autopct='%1.1f%%', shadow=False)
+    nvp.pie(nv_pie, labels=keys, autopct='%1.1f%%', shadow=False, colors=['c','g','r'])
+    #pylab.title('NVIDIA', bbox={'facecolor':'0.8', 'pad':5})
+    nvp.text(-.5, -1.6, "NVIDIA", fontsize="30")
+
+    #pylab.figure(5, figsize=(6,6))
+    #ax = pylab.axes([0.1, 0.1, 0.8, 0.8])
+    #pylab.pie(ati_pie, labels=keys, autopct='%1.1f%%', shadow=False)
+    #pylab.pie(ati_pie, labels=keys, autopct='%1.1f%%', shadow=False)
+    atip.pie(ati_pie, labels=keys, autopct='%1.1f%%', shadow=False, colors=['c','g','r'])
+    #atip.title('ATI', bbox={'facecolor':'0.8', 'pad':5})
+    atip.text(-.3, -1.6, "ATI", fontsize="30")
+    #pylab.pie(ati_timings, labels='AMD')
         
+    #atip.legend(loc="lower center")
+
     #for key in keys:
         #pylab.plot(nv_nums, nv_timings[key], 'o-', label='NVIDIA ' + key)
         #pylab.plot(nv_nums, ati_timings[key], 's--', label='AMD' + key)

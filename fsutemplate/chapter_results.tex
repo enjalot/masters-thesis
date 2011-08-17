@@ -36,7 +36,8 @@ milliseconds a lower number is preferred.
 
 \begin{figure}[!htc]
  		\centering
-        \includegraphics[scale=0.45]{figures/maxnum_eq_num_fps.png}
+        %\includegraphics[scale=0.45]{figures/maxnum_eq_num_fps.png}
+        \includegraphics[width=\columnwidth]{figures/maxnum_eq_num_fps.png}
         \caption{ {\footnotesize Performance of RTPS compared with SimpleSPH. Here the maximum
         particle setting for RTPS is the same as the number of particles used
         for timing}}
@@ -60,14 +61,16 @@ used as can be seen in Figure \ref{fig:fps_1mill}.
 
 \begin{figure}[!htc]
  		\centering
-        \includegraphics[scale=0.45]{figures/maxnum_eq_1mill_fps.png}
+        %\includegraphics[scale=0.45]{figures/maxnum_eq_1mill_fps.png}
+        \includegraphics[width=\columnwidth]{figures/maxnum_eq_1mill_fps.png}
         \caption{ {\small Performance of RTPS with the maximum number of particles
         setting equal to 1 million. The timings for RTPS are collected using
         the given number of particles.}}
         \label{fig:fps_1mill}
 \end{figure}
 
-\pagebreak
+%\pagebreak
+\newpage
 One sees from Figure \ref{fig:kernel_time} that the Density and Force calculations are by far
 the most expensive routines. These routines have the most memory accesses, and
 the more neighbors that each particle must calculate, the more memory accesses
@@ -78,7 +81,8 @@ contributes a non-trivial amount of time to the computation.
 
 \begin{figure}[!htc]
  		\centering
-		\includegraphics[scale=0.4]{figures/nv_kernel_num.png}
+		%\includegraphics[scale=0.4]{figures/nv_kernel_num.png}
+		\includegraphics[width=\columnwidth]{figures/nv_kernel_num.png}
         \caption{ GPU timings for each kernel }
         \label{fig:kernel_time}
 \end{figure}
@@ -89,16 +93,18 @@ negligible effect on the cost. This is most likely due to the overhead of
 launching the kernels overshadowing the small amount of memory accesses and
 computations required by such a small amount of particles. 
 
-\pagebreak
+%\pagebreak
+%\newpage
 
 Figure \ref{fig:pies} shows the proportion of time taken by the most expensive
 kernels on each video card using 262144 particles. The proportions are similar
 for each card, with the sort more expensive on the AMD hardware.
 
-\begin{figure}[!htc]
- 		%\centering
-        \subfloat[NVIDIA]{\label{fig:nv_pie}\includegraphics[scale=0.4]{figures/nv_pie.png}}
-        \\ \subfloat[AMD]{\label{fig:ati_pie}\includegraphics[scale=0.4]{figures/ati_pie.png}}
+\begin{figure}[!htbp]
+ 		\centering
+		\includegraphics[width=\columnwidth]{figures/nv_ati_pie.png}
+        %\subfloat[NVIDIA]{\label{fig:nv_pie}\includegraphics[scale=0.4]{figures/nv_pie.png}}
+        %\\ \subfloat[AMD]{\label{fig:ati_pie}\includegraphics[scale=0.4]{figures/ati_pie.png}}
         \caption{ Proportion of GPU timings for the most expensive kernels on each card }
         \label{fig:pies}
 \end{figure}
@@ -106,8 +112,12 @@ for each card, with the sort more expensive on the AMD hardware.
 \toi{use different line styles as well, dotted, dashed etc}
 \toi{fix pie charts by putting percentages in the graphs or captions}
 
-\pagebreak
+%\pagebreak
 \clearpage
+\newpage
+
+
+
 
 \section{Data Structures}
 The data structures used on the GPU are given as follows:
