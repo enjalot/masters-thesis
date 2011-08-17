@@ -122,6 +122,7 @@ particle the continuity equation can be omitted, instead the density of each par
 \end{align}
 using equation \ref{eqn:sphff} which can be simplified to
 \begin{align}
+\label{eqn:sphdens}
 \rho_i = \sum_j m_j W(r_i - r_j, h).
 \end{align}
 \\
@@ -235,58 +236,55 @@ with the Laplacian given by
 Collisions are handled by exerting a repulsion force on particles which collide
 with a surface. The repulsion force is given by
 \begin{align}
-F^{repulsion} = (stiffness * distance - dampening * n \cdot v))*n;
+F^{repulsion} = (stiffness * distance - dampening * n \cdot v))*n
 \end{align}
 where $n$ is the normal of the surface, $v$ is the velocity of the particle,
 $distance$ is the distance of the particle to the surface and
 $stiffness$ and $dampening$ are user-defined parameters to control the behavior of
-the repulsion force.\cite{Krog2010}
+the repulsion force \cite{Krog2010}.
 
 \subsubsection{Domain}
-For convenience the fluid is considered to exist in a domain, where each wall
+For convenience, the fluid is considered to exist in a domain, where each wall
 of the domain is a surface against which the particles can collide. The walls
 are defined as minimum or maximum values in each axis, with a corresponding
-normal along the axis pointing inside the domain. 
+normal along the axis pointing into the domain. 
 
-\subsubsection{Triangles}
-
-Collisions with arbitrary triangles are calculated are performed by using an
-algorithm for intersecting a line segment with a triangle from \cite{Ericson}. The line segment is
-created by adding the velocity scaled by a distance parameter to the particle
-position. The technique uses barycentric coordinates to test if the point where
-the segment intersects with the plane of the triangle is within the triangle.
-The implemented routine is given in Appendix X.
-
-%\cite{Ericson} %Real-Time collision detection pp 191
+\subsubsection{Triangles} 
+Collisions with arbitrary triangles are calculated
+are performed by using an algorithm for intersecting a line segment with a
+triangle.  The line segment is created by adding the velocity scaled by a
+distance parameter to the particle position. The technique uses barycentric
+coordinates to test if the point where the segment intersects with the plane of
+the triangle is within the triangle \cite{Ericson}.
 
 
 \section{Integration}
 
-The SPH method provides the forces which describe the change in velocity over
+The SPH method provides the forces that describe the change in velocity over
 time. Two modifications are made to these forces to increase stability. The
-first is a speed limit, which clamps the magnitude of the force to a user defined speed.
+first is a speed limit, which clamps the magnitude of the force to a user-defined speed.
 \begin{align}
 F = \begin{cases} s * \frac{F}{|F|} & \text{if $|F| > s$}
     \\
     F & \text{$otherwise$}
 \end{cases}
 \end{align}
-where $s$ is the user defined speed limit and $F$ is the force vector.
+where $s$ is the user-defined speed limit and $F$ is the force vector.
 
 The second modification is a smoothing of the velocity given by
 \begin{align}
 v_i = v_i + \epsilon \sum_{j \ne i} 2m_j \frac{(v_j - v_i)}{(\rho_i + \rho_j)} W(r_i - r_j, h)
 \end{align}
-where $\epsilon$ is a user defined parameter between $0$ and $1$.
+where $\epsilon$ is a user-defined parameter between $0$ and $1$.
 
 \subsection{Time Integration}
-To advect the particles in time, the second order Leap-Frog integration method
+To advect the particles in time, the second-order Leap-Frog integration method
 is used. The new position and velocity each time step is given by
 \begin{align}
-x_{i+1} = x_i + v_i dt + \frac{a_i}{2} dt^2
+x_{i+1} = x_i + v_i dt + \frac{a_i}{2} dt^2,
 \end{align}
 \begin{align}
-v_{i+1} = v_i + \frac{(a_i + a_i+1)}{2} dt
+v_{i+1} = v_i + \frac{(a_i + a_i+1)}{2} dt,
 \end{align}
 where $i$ denotes the current time-step, $x$ is the position vector, $v$ is the velocity vector and $a$ is the acceleration vector.
 

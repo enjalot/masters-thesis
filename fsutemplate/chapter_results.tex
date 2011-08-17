@@ -9,23 +9,23 @@ more complex physical phenomenon as well as more interesting interactions.
 
 \section{Performance}
     
-The performance of the project was benchmarked on two modern GPUs, an NVIDIA
+The performance of the project was benchmarked on two modern GPUs: an NVIDIA
 GTX 480 and an AMD FirePro V7800. The GTX 480 has 480 CUDA Cores and 1.5GB of
 video memory while the FirePro V7800 has 1440 Stream processors and 2GB of
-video memory. The number of cores and processors do not directly correspond to
+video memory. The number of cores and processors do not directly map to
 performance, as can be seen from the timings presented in Figure 7.1.
 
 
 In addition to benchmarking the project, the CUDA SPH implementation from
-Krog\cite{Krog2010} was run on with the GTX 480. As shown in Figure 7.1 RTPS is
+Krog\cite{Krog2010} was run on with the GTX 480. As shown in Figure \ref{fig:fps_num}, RTPS is
 not yet as efficient as SimpleSPH. Comparisons with CPU implementations were
 not carried out as the literature has shown the wide gap in performance makes
-the CPU non-competitive.\cite{Hoetzlein}\cite{Krog2010}
+the CPU non-competitive \cite{Hoetzlein}\cite{Krog2010}.
 
 Frames per Second (fps) is an important metric for most video game players.  A
 reasonable number for an interactive 3D game is 60fps, although 30fps is
 sometimes deemed acceptable. Note that movies play at 24fps. The performance of
-the simulations are compared with frames per second, while analysis of the
+the simulations are compared in frames per second, while analysis of the
 routines within the simulation is measured in milliseconds. Updating one frame
 takes 17ms to obtain a frame rate of 60fps, and 33ms at 30fps. In the following
 timings, when using fps a higher number is desirable while when measuring in
@@ -37,20 +37,21 @@ milliseconds a lower number is preferred.
 \begin{figure}[!htc]
  		\centering
         \includegraphics[scale=0.45]{figures/maxnum_eq_num_fps.png}
-        \caption{ {\footnotesize Performance of RTPS compared with SimpleSim. Here the maximum
+        \caption{ {\footnotesize Performance of RTPS compared with SimpleSPH. Here the maximum
         particle setting for RTPS is the same as the number of particles used
         for timing}}
         \label{fig:fps_num}
 \end{figure}
-
+\toi{fix figure, legend should say SimpleSPH and each curve should have different markers}
+\toi{fix figures/pagebreaks/clearpages to remove extra space}
 
 For the timings in \ref{fig:fps_num} the only parameter varied is the maximum number of particles.
 For each case the maximum number of particles is emitted and the timing of each
 function call is averaged over 1000 iterations.
 
 
-One logical use scenario would involve setting a large maximum number of
-particles and only using a relatively small subset of them. This will make the
+One logical use scenario involves setting a large maximum number of
+particles and only using a relatively small subset of them. This makes the
 radius of each particle smaller if the domain size remains fixed, allowing the
 user to get a more detailed simulation. It turns out that this use case is much
 more efficient than setting the maximum number of particles to the amount to be
@@ -67,9 +68,9 @@ used as can be seen in Figure \ref{fig:fps_1mill}.
 \end{figure}
 
 \pagebreak
-One can see from Figure \ref{fig:kernel_time} that the Density and Force calculations are by far
+One sees from Figure \ref{fig:kernel_time} that the Density and Force calculations are by far
 the most expensive routines. These routines have the most memory accesses, and
-the more neighbors that each particle must calculate the more memory accesses
+the more neighbors that each particle must calculate, the more memory accesses
 these routines use. It is important to note that the Sorting routine
 contributes a non-trivial amount of time to the computation.
 
@@ -82,8 +83,8 @@ contributes a non-trivial amount of time to the computation.
         \label{fig:kernel_time}
 \end{figure}
 
-Figure \ref{fig:kernel_time} shows a linear increase in cost as the number of
-particles increase past 16384. Below this number increasing the particles has a
+Figure \ref{fig:kernel_time} shows a linear increases in cost as the number of
+particles increase past 16384. Below this number, increasing the particles has a
 negligible effect on the cost. This is most likely due to the overhead of
 launching the kernels overshadowing the small amount of memory accesses and
 computations required by such a small amount of particles. 
@@ -92,7 +93,7 @@ computations required by such a small amount of particles.
 
 Figure \ref{fig:pies} shows the proportion of time taken by the most expensive
 kernels on each video card using 262144 particles. The proportions are similar
-for each card, with the sort contributing more on the AMD hardware.
+for each card, with the sort more expensive on the AMD hardware.
 
 \begin{figure}[!htc]
  		%\centering
@@ -101,6 +102,9 @@ for each card, with the sort contributing more on the AMD hardware.
         \caption{ Proportion of GPU timings for the most expensive kernels on each card }
         \label{fig:pies}
 \end{figure}
+
+\toi{use different line styles as well, dotted, dashed etc}
+\toi{fix pie charts by putting percentages in the graphs or captions
 
 \pagebreak
 \clearpage
@@ -134,10 +138,10 @@ The data structures used on the GPU are given as follows:
 Using the standard size of single precision floats and unsigned ints of 4
 bytes, each particle requires $45*4$ or $180$ bytes of memory. Each grid cell
 requires $8$ bytes of memory. With this configuration a simulation with 65,536
-particles will require a grid with 12,167 cells for a total of 11.34MB. A
-simulation with 1,048,576 particles will require a grid with 132,651 cells and a
+particles requires a grid with 12,167 cells for a total of 11.34MB. A
+simulation with 1,048,576 particles requires a grid with 132,651 cells and a
 total of 181MB. These numbers do not come close to saturating the 2GB of memory
-available on modern GPUs.
+available on many modern GPUs.
 
 
 \section{Community}
@@ -176,7 +180,7 @@ and able to help.
 The following figures demonstrate various possible simulations using the RTPS
 framework inside the Blender Game Engine. Figure \ref{fig:dam_break} shows a
 simple dam break simulation with collision against boxes inside the domain.
-Here relatively few particles are used and the simulation runs at 60fps.
+Here approximately $10\%$ of the maximum number of particles are used and the simulation runs at 60fps.
 
 %\begin{figure}[H]
 \begin{figure}[!htc]
@@ -193,7 +197,7 @@ Here relatively few particles are used and the simulation runs at 60fps.
 
 Figures \ref{fig:flood1} and \ref{fig:flood2} show a water flooding simulation where
 over 100k particles are emitted through several hoses and then collide against
-cubes placed in the domain. The maximum number of particles was set to
+cubes placed within the domain. The maximum number of particles was set to
 1,000,000 for a higher resolution simulation at the cost of real-time. This
 simulation averaged 10fps.
 
@@ -243,7 +247,7 @@ splashes in the fluid.
 
 Videos have been recorded throughout the process of this research and are
 available on the web. The videos serve as progress reports of the project
-throughout its development, each one highlighting new features or explaining
+throughout its development, each highlights new features or explains
 design decisions made. These videos are listed in reverse chronological order
 from most recent to oldest. \\
 \url{http://vimeo.com/21743717} \\
