@@ -4,14 +4,14 @@
 Video games have seen remarkable growth in recent times, and are one of the
 largest entertainment industries \cite{Kafai2006}. Interactive games are played by
 children and adults of all ages, on specialized consoles, on workstations and
-even telephones. The pervasiveness of games in our culture is not in dispute,
-their effect however, is.\cite{Ferguson2007} Parents raise concern over the amount of time
+even telephones. Although the pervasiveness of games in our culture is not in dispute,
+their effect is \cite{Ferguson2007}. Parents raise concern over the amount of time
 children spend playing games, and what their children may be learning from the
 content in these games. The aim of this research is to help develop games which
 encourage interest in science and teach scientific concepts, methodology and
 thought processes. Applying video game technology to education is an ongoing
-area of research and practice\cite{Hayes2008}. 
-
+area of research and practice \cite{Hayes2008}. 
+\toi{expand this first paragraph explaining each cited statement}
 
 Tools for building games are varied and many, ranging from complex 3D modeling
 programs, sophisticated physics simulators and design authoring programs. Many
@@ -38,8 +38,8 @@ to simulate convincing fluids at frame rates suitable for games. The GPU was
 developed as a way to accelerate the 3D graphics rendering used in PC video
 games and has been a huge commercial success. A modern high-end consumer GPU
 has the same computational power as a supercomputer from 10 years prior.
-Methods from Computational Fluid Dynamics developed for supercomputers could be
-adapted to work on a consumer PC.
+Most methods from Computational Fluid Dynamics developed for supercomputers
+have already beeen ported to the consumer desktop or laptop.
 
 
 The goal of this research is to develop an open source tool implementing the
@@ -57,42 +57,43 @@ an overview of future work planned for the project in Chapter 8.
 
 Interactive fluid simulation for use in games draws heavily from Computational
 Fluid Dynamics (CFD) and Computer Graphics research. The use of CFD methods for
-film and animation spans two decades\cite{Tan2009} and has improved in
+film and animation spans two decades \cite{Tan2009} and has improved in
 performance tremendously. One of the most common techniques for interactive
 simulations of fluids is the Smoothed Particle Hydrodynamics (SPH) method
 because of its relatively low cost and high flexibility. It was adapted for use
-in computer animation by Desbrun et al. in 1996.\cite{Desbrun1996}. 
+in computer animation by Desbrun et al. in 1996 \cite{Desbrun1996}. 
 
 
 Blender, a popular 3D content creation suite, and the software used as a
-platform for this thesis includes two fluid simulators, one based on SPH\cite{Clavet2005} and
-one based on the Lattice Boltzmann Method\cite{Nils2006}. Neither of these simulators are
-designed to run in real-time, nor are they available in the Blender Game
-Engine. 
+platform for this thesis includes two fluid simulators, one based on SPH
+\cite{Clavet2005} and one based on the Lattice Boltzmann Method
+\cite{Nils2006}. These simulators are not designed to run in real-time,
+and are not available in the Blender Game Engine. 
 
+\toi{explain SPH in general terms}
 
 In 2003 Muller et al. used SPH to achieve 5000 particles at 5 frames per
-second\cite{Muller2003}.  Others implemented interactive SPH simulations with
+second \cite{Muller2003}.  Others implemented interactive SPH simulations with
 various improvements and additions to the algorithm with similar
-performance.\cite{Kallin2009}\cite{Kelager2006}
+performance \cite{Kallin2009}\cite{Kelager2006}.
 With the advent of GPU computing, researchers capitalized on the parallel
-implementations of SPH and were able to achieve real-time results with 16,000 particles.\cite{Harada2007a}
+implementations of SPH and were able to achieve real-time results with 16,000 particles \cite{Harada2007a}.
 Many types of particle systems have been accelerated with the GPU, and several issues
 important to general particle systems such as accessing values of neighboring
-particles are important in SPH.\cite{Knowles2009}
+particles are important in SPH \cite{Knowles2009}.
 The CUDA programming language made general purpose programming on the GPU more
 accessible and researchers were able to achieve upwards of 60 frames per second
-for simulations involving 60,000 interacting particles.\cite{Seizinger2010}
+for simulations involving 60,000 interacting particles \cite{Seizinger2010}.
 Recently SPH was implemented in CUDA with complex simulations able to handle
 128,000 particles in real-time and simple simulations with upwards of 500,000
-particles.\cite{Krog2010}. Real-time simulation is only part of the goal of making
+particles \cite{Krog2010}. Real-time simulation is only part of the goal of making
 realistic interactive fluid animations. Techniques for rendering the
 surface of a fluid have been studied along with improvements to SPH in CUDA 
-produced convincing animations with 75,000 particles.\cite{Goswami2010} 
+produced convincing animations with 75,000 particles \cite{Goswami2010}.
 
 
 For further historical reviews of SPH implementations see Hoetzlein et.
-al\cite{Hoetzlein} and Krog's Master's Thesis.\cite{Krog2010}
+al \cite{Hoetzlein} and Krog's Master's Thesis \cite{Krog2010}.
 
 
 

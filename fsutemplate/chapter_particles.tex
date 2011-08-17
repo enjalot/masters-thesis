@@ -2,7 +2,7 @@
 
 \section{Particle Systems}
 A Particle system is a system composed of points in space whose behavior is
-defined by rules which act on those points. Most commonly used in graphics and
+defined by rules that act on those points. Most commonly used in graphics and
 video games to simulate special effects like fire, smoke, water and explosions
 particle systems are also used in computational fluid dynamics, astrophysics
 and materials science.
@@ -16,68 +16,68 @@ and materials science.
         \caption{ pretty particle system picture }
 \end{figure}
 \end{comment}
-
+\toi{put in a particle system picture}
 
 
 All particle systems share some fundamental properties, first they must be able
-to represent points in 1, 2 or 3 dimensional space. For the purpose of this
-research  3 dimensions will be used, with the location of each particle being
-denoted with the coordinates \verb|x|, \verb|y| and \verb|z|. Each particle is
-conceptualized as an unique individual in the system, usually representing some
-small piece of a larger whole. In the fluid simulation of this research each
+to represent points in 1-, 2- or 3-dimensional space. For the purpose of this
+research  3 dimensions will be used, with the location of each particle 
+denoted with the coordinates \verb|x|, \verb|y| and \verb|z| in a Cartesian coordinate system. Each particle is
+conceptualized as a unique individual in the system, usually representing some
+small piece of a larger whole. In the fluid simulation of this research, each
 particle represents some small volume of water, but for a fire effect the
 particle serves as an animated paint brush. In both cases each particle will
 have some associated properties unique to it, such as its density in the water
 simulation, or its color in the fire effect.
 
 
-A particle system is not useful unless it changes over time, therefore it is
-important to have the concept of a \verb|time-step|. The time-step is used to
-determine how fast a system changes over time. It is important to distinguish
-between simulation time and real-time, one can simulate the formation of a
-galaxy over a million years, or the creation of a protein in nanoseconds and
-render each as a 30 second movie. We will discuss simulation time in terms of
-\verb|updates| to the system, where each update advances the simulation time
-one time-step. The creator of the system can determine how many updates to
-perform for some unit of real-time. This is usually measured in frames per
-second, where a frame is the rendering of a 3D scene to be displayed. A
-desirable frames per second (fps) for a video game is 60fps, with 30fps
-considered real-time. For reference, movies are displayed at 24fps. 
+A particle system is not useful unless the properties of it's particles change
+in time, therefore it is important to have the concept of a \verb|time-step|.
+The time-step determines how fast a system changes over time. It is important
+to distinguish between simulation time and real-time. One can simulate the
+formation of a galaxy over a million years, or the creation of a protein in
+nanoseconds and render each as a 30 second movie. We will discuss simulation
+time in terms of \verb|updates| to the system, where each update advances the
+simulation time one time-step. The creator of the system can determine how many
+updates to perform for some unit of real-time. This is usually measured in
+frames per second, where a frame is the rendering of a 3D scene to be
+displayed. A desirable frames per second (fps) for a video game is 60fps, with
+30fps or above considered real-time. For reference, movies are often displayed
+at 24fps. 
 
 
 Each particle has a location and some properties associated with it, and these
-can all change over time. The most common way to control how they change is by
-calculating the forces exerted on each particle. These forces can be external
-to the system, such as gravity or force fields (like wind) or internal, meaning
-the particles exert force on each other. When we update the system, we want to
-calculate a new location for each particle based on the forces applied to it.
-This is done by integrating the force to obtain a velocity and then integrating
-the velocity to obtain the new position.
+can all change in time. Most particle systems follow physical rules, where the
+location of each particle is updated according to forces acting upon it. In
+these systems properties can include velocity, mass, temperature and other
+physical concepts. The forces used to update the locations of the particles can
+be external to the system, such as gravity or force fields (like wind) or
+internal, meaning the particles exert force on each other based on their
+properties. The forces are used to update the particle locations according to
+Newton's laws of motion.
 
 
 Particle systems are especially interesting because simple rules governing the
 behavior of each particle can lead to complex behavior of the whole system.
-Particle systems have been classified into various classes based on how the
-particles interact. Non-interacting particle systems are simply systems where
-all of the forces are determined by the individual particle and no others are
-considered, commonly used to simulate fireworks. Long range interacting
+Particle systems have been classified based on how the particles interact.
+Non-interacting particle systems are simply systems wherein one particle can
+not affect another, commonly used to simulate fireworks. Long range interacting
 particle systems are systems where most of the particles interact with every
-other particle, such as in gravitational N-body systems. Short range
-interacting particle systems are systems such as the fluid simulator proposed
-in this research, where each particle interacts with neighbors in a small
-region around it. \cite{Knowles2009} 
+other particle, such as in gravitational $N$-body systems.  Short range
+interacting particle systems are systems such as the fluid simulator
+implemented in this research, where each particle interacts with neighbors in a
+small region around it \cite{Knowles2009}.
 
 
 
 
 \section{Introduction to the Framework}
 
-There are many aspects to particle systems which will be common to different
-simulations, namely the locations of each particle in some space as well as the
-notion of displaying them in some way. In order to create an extensible tool 
-this project designed an object oriented software framework for general particle systems.
-The primary motivation for this is to avoid duplicating work when creating
-different simulations.
+There are many aspects to particle systems that are common to different
+simulations, such as particle location and particle rendering. In order to
+create an extensible tool, this project is designed as an object-oriented
+software framework for general particle systems.  The primary motivation for
+this is to avoid duplicating work when creating different types of simulations.
 
 
 We first define an interface for the user of the particle system to interact
@@ -86,20 +86,20 @@ initial settings and exposes functions to update and render the particles. It
 also allows access to it's internal system object, which has functions for
 interacting with the system directly. These functions are general for all
 systems, but may be implemented differently by different types of systems. For
-example inserting particles to the system, or setting up a "hose" which will
+example inserting particles to the system, or setting up a "hose" to 
 spray particles.
 
 
 The rendering of particles is handled separately from the simulation so that
 different particle systems may take advantage of the available rendering
-classes. It is also easy to add a new way of rendering by defining a new
+classes. It is also easy to add a new rendering algorithm by defining a new
 rendering class derived from the \verb|Render| class.
 
 
 Someone wishing to add a new type of particle system does not have to spend
-much energy on infrastructure but can rather focus on implementing the rules
-which govern the behavior of their particles, or adding new functionality to
-interface with some external projects. It is likely that users will want to
+much energy on infrastructure but can focus on implementing the rules
+which govern the behavior of their particles, or can add new functionality to
+interface with some external projects. However it is likely that users will want to
 integrate particles into their existing game mechanics, and the framework has
 been designed with this in mind.
 
