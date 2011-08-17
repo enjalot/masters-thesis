@@ -4,7 +4,7 @@
 
 In this section we discuss the various classes that make up the Real-Time
 Particle System framework. Filenames will be denoted as such \verb|rtpslib/RTPS.h|
-and refer to the directory structure of the code in Appendix \ref{appendix:download}.
+and refer to the directory structure of the code in Appendix section \ref{appendix:download}.
 
 \begin{figure}[!htc]
  		\centering
@@ -257,7 +257,7 @@ reuse the neighbor search code. Different kernels may require access to
 different arrays within the ForNeighbor routine. In order to use different
 arguments with the same code, \verb|#define| macros are used to specify
 the arguments of each function and the values passed through. An example of
-this is provided in Appendix \ref{appendix:density}.
+this is provided in Appendix section \ref{appendix:density}.
 
 \section{Particle Insertion and Deletion}
 Particles can be dynamically inserted into and deleted from the simulation by
@@ -298,7 +298,7 @@ to the Domain and spatial grid. The second is \verb|SPHParams|, which holds
 all the parameters relevant to the SPH simulation. These structures are
 populated by the \verb|SPH| and \verb|SPHSettings| classes and passed to all of
 the OpenCL kernels as constant memory structures. The \verb|SPHParams|
-structure is listed in Appendix \ref{appendix:sphparams}.
+structure is listed in Appendix section \ref{appendix:sphparams}.
 
 
 \subsection{Calculated Parameters}
@@ -347,7 +347,7 @@ mass. In this implementation the particle mass is uniform for all particles and
 is thus passed in as a constant.  The density calculation is controlled by the
 \verb|Density| class defined in \verb|rtpslib/system/sph/Density.cpp| and the
 OpenCL kernel is defined in \verb|rtpslib/system/sph/cl_src/density.cl|. The
-density kernel is included in Appendix \ref{appendix:density}.
+density kernel is included in Appendix section \ref{appendix:density}.
 
 \subsection{Force}
 The force calculation is controlled by the \verb|Force| class defined in
@@ -891,5 +891,5 @@ instance is called instead.
 
 \subsection{Files}
 For a complete list of Blender source files modified by the project please
-refer to Appendix \ref{appendix:modified} 
+refer to Appendix section \ref{appendix:modified} 
 
