@@ -76,6 +76,13 @@ the most expensive routines. These routines have the most memory accesses, and
 the more neighbors that each particle must calculate, the more memory accesses
 these routines use. It is important to note that the Sorting routine
 contributes a non-trivial amount of time to the computation.
+%Figure \ref{fig:kernel_time} shows 
+One also a linear increases in cost as the number of particles increase past
+16384. Below this number, increasing the particles has a negligible effect on
+the cost. This is most likely due to the overhead of launching the kernels
+overshadowing the small amount of memory accesses and computations required by
+such a small amount of particles. 
+
 
 %\pagebreak
 
@@ -86,12 +93,6 @@ contributes a non-trivial amount of time to the computation.
         \caption{ GPU timings for each kernel }
         \label{fig:kernel_time}
 \end{figure}
-
-Figure \ref{fig:kernel_time} shows a linear increases in cost as the number of
-particles increase past 16384. Below this number, increasing the particles has a
-negligible effect on the cost. This is most likely due to the overhead of
-launching the kernels overshadowing the small amount of memory accesses and
-computations required by such a small amount of particles. 
 
 %\pagebreak
 %\newpage
