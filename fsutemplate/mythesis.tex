@@ -101,13 +101,6 @@ adults spend countless hours playing sophisticated computer games. The focus of
 this research is the development of tools which can help bring the entertaining
 and appealing traits of video games to scientific education.
 
-One of the main factors contributing to the rise in computational power and the
-increasing sophistication of video games is the Graphics Processing Unit (GPU).
-As a piece of consumer hardware a GPU is relatively low cost and available to
-almost anyone with a computer. The market for GPUs has been primarily driven by
-video gamers wanting to improve the experience of their games through better
-and often more realistic graphics. 
-
 Video game developers use many tools and programming languages to build their
 games, for example the Blender 3D content creation suite. Blender includes a
 Game Engine that can be used to design and develop sophisticated interactive
@@ -117,12 +110,18 @@ possible. The particle system available in Blender is unfortunately not
 available in the Blender Game Engine because it is not fast enough to run in
 real-time.
 
-This thesis presents a particle system library integrated into the Blender Game
+One of the main factors contributing to the rise in computational power and the
+increasing sophistication of video games is the Graphics Processing Unit (GPU).
+Many consumer personal computers are equipped with powerful GPUs which can be
+harnassed for general purpose computation.
+
+This thesis presents a particle system library is accelerated by the GPU using
+the OpenCL programming language.  The library integrated into the Blender Game
 Engine providing an interactive platform for exploring fluid dynamics and
-creating video games with realistic water effects.  The library is accelerated
-by the GPU using the OpenCL programming language. The primary system
-implemented in this research is a fluid simulator using the Smoothed Particle
-Hydrodynamics technique for simulating incompressible fluids such as water.
+creating video games with realistic water effects.
+The primary system implemented in this research is a fluid simulator using the
+Smoothed Particle Hydrodynamics technique for simulating incompressible fluids
+such as water.
 
 The library created for this thesis can simulate water using SPH at
 40fps with upwards of 100,000 particles on an NVIDIA GTX480 GPU. The
@@ -152,6 +151,9 @@ user interface of Blender.
 \input appendix_modified
 
 %\toi{double check bib}
+%\toi{columnwidth for all images}
+%\toi{short captions for figures}
+%\toi{remove equation numbers from ones not mentioned}
 
 % You have your choice of bibliography sections, either
 % hand-crafted or BibTeX.
