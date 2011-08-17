@@ -11,7 +11,6 @@ content in these games. The aim of this research is to help develop games which
 encourage interest in science and teach scientific concepts, methodology and
 thought processes. Applying video game technology to education is an ongoing
 area of research and practice \cite{Hayes2008}. 
-\toi{expand this first paragraph explaining each cited statement}
 
 Tools for building games are varied and many, ranging from complex 3D modeling
 programs, sophisticated physics simulators and design authoring programs. Many
@@ -63,14 +62,20 @@ simulations of fluids is the Smoothed Particle Hydrodynamics (SPH) method
 because of its relatively low cost and high flexibility. It was adapted for use
 in computer animation by Desbrun et al. in 1996 \cite{Desbrun1996}. 
 
-
 Blender, a popular 3D content creation suite, and the software used as a
 platform for this thesis includes two fluid simulators, one based on SPH
 \cite{Clavet2005} and one based on the Lattice Boltzmann Method
 \cite{Nils2006}. These simulators are not designed to run in real-time,
 and are not available in the Blender Game Engine. 
 
-\toi{explain SPH in general terms}
+Smoothed Particle Hydrodynamics works by representing a fluid as many
+particles, each with physical properties such as mass and volume, and defines
+rules for interactions between the particles based on the Navier-Stokes
+equations. The accuracy of SPH depends largely on the number of particles used
+to simulate a body of fluid, as does the performance. The literature shows a
+clear trend in increasing the number of particles that are able to be simulated
+in real-time so that more convincing fluid simulations can be achieved.
+
 
 In 2003 Muller et al. used SPH to achieve 5000 particles at 5 frames per
 second \cite{Muller2003}.  Others implemented interactive SPH simulations with

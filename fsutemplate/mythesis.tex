@@ -46,11 +46,34 @@
 \makesignaturepage
 
 \begin{dedication}
-\toi{dedication}
+I dedicate this thesis to my parents David and Corine, who taught me both
+explicitly and implicitly the value of education. All my life they have
+fostered my curiousity and encouraged me to explore, for which I am eternally
+grateful.
 \end{dedication}
 
 \begin{acknowledgments}
-\toi{acknowledgments}
+This thesis was made possible by the help and support of many people both near and far.
+First and foremost I must thank my Advisor, Dr. Gordon Erlebacher for his
+relentless support and encouragement. Dr. Erlebacher has an infectious love for
+improvement and were it not for his help, both the code and my understanding
+would be far short of where they are today. I thank him for training me to think like a scientist.
+
+I must thank Dr. Anter El-Azab and Dr. Tomasz Plewa not only for taking the
+time to be in my committee but for being excellent educators who have broadened
+and deepend my understanding of scientific computing.
+
+I would also like to thank my colleagues and friends in the Department of Scientific
+Computing who have spent countless hours in the vizlab discussing, helping and
+playing. Thank you Evan, Andrew, Nathan, Myrna, Steve and Olmo.
+
+This project would not have been possible without the help and support of the
+wonderful Blender community, thank you Moguri, dfelinto, Mike Pan and everyone
+in the IRC channel, BlenderArtists and BlenderNation who helped and encouraged
+me.
+
+Finally I would like to thank my girlfriend Michelle for her support, including
+but not limited to, making coffee for me all those late nights.
 \end{acknowledgments}
 
 \tableofcontents
@@ -94,14 +117,20 @@ possible. The particle system available in Blender is unfortunately not
 available in the Blender Game Engine because it is not fast enough to run in
 real-time.
 
-This thesis presents a particle system library accelerated by the GPU using the
-OpenCL programming language. The primary system implemented in this research is
-a fluid simulator using the Smoothed Particle Hydrodynamics technique for
-simulating incompressible fluids such as water. The library is integrated into the Blender
-Game Engine providing an interactive platform for exploring fluid dynamics and
-creating video games with realistic water effects.
+This thesis presents a particle system library integrated into the Blender Game
+Engine providing an interactive platform for exploring fluid dynamics and
+creating video games with realistic water effects.  The library is accelerated
+by the GPU using the OpenCL programming language. The primary system
+implemented in this research is a fluid simulator using the Smoothed Particle
+Hydrodynamics technique for simulating incompressible fluids such as water.
 
-\toi{Add some stuff about results}
+The library created for this thesis can simulate water using SPH at
+40fps with upwards of 100,000 particles on an NVIDIA GTX480 GPU. The
+fluid system has interactive features such as object collision, and the
+ability to add and remove particles dynamically. These features as well as
+phsyical properties of the simulation can be controlled intuitively from the
+user interface of Blender. 
+
 
 \end{abstract}
 
@@ -122,7 +151,7 @@ creating video games with realistic water effects.
 \input appendix_code
 \input appendix_modified
 
-\toi{double check bib}
+%\toi{double check bib}
 
 % You have your choice of bibliography sections, either
 % hand-crafted or BibTeX.
