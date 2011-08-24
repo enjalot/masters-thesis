@@ -57,9 +57,9 @@ for ms in ati_mill_timings["Update loop"]:
     ati_mill_rtps_fps += [ms2fps(ms)]
 
 
-fps = False#True 
+fps = True 
 nv_kernel = False#True 
-nv_ati_neighbors = True 
+nv_ati_neighbors = False 
 nv_neighbors = False 
 
 
@@ -70,6 +70,7 @@ if fps:
     fps_ticks = [30, 60, 100, 200, 400, 1000]
     krog_fps = [1424, 1084, 837, 429, 245, 140, 74]
     fig = pylab.figure(0)
+    print nv_rtps_fps
     pylab.plot(nv_nums[2:], krog_fps[2:], 'H-', linewidth=4, markersize=10, label='SimpleSPH on GTX480 max_num = num')
     pylab.plot(nv_nums[2:], nv_rtps_fps[2:], '^-', linewidth=4, markersize=10, label='RTPS on GTX480 max_num = num')
     pylab.plot(nv_nums[2:], ati_rtps_fps[2:], 'o-', linewidth=4, markersize=10, label='RTPS on FireProV7800 max_num = num')
